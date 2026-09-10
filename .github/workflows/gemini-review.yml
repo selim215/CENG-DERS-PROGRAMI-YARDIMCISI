@@ -1,0 +1,38 @@
+name: Gemini Code Reviewer
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Kodu Klonla
+        uses: actions/checkout@v4
+
+      - name: Python Ortamı Kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Gemini SDK Kur
+        run: pip install google-generativeai
+
+      - name: Gemini ile Kodu İncele
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python -c "
+          import os, google.generativeai as genai
+          genai.configure(api_key=os.environ['GEMINI_API_KEY'])
+          model = genai.GenerativeModel('gemini-1.5-flash')
+          response = model.generate_content('Ders programı optimizasyon projesinde yapılan son değişiklikleri kod kalitesi, performans ve güvenlik açısından kısaca değerlendir.')
+          print('Gemini Incelemesi:\n', response.text)
+          "
