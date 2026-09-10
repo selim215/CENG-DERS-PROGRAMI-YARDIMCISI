@@ -1,0 +1,588 @@
+{
+  "courses": [
+    {
+      "code": "BM101",
+      "name": "Bilgisayar Programlama",
+      "type": "departmental",
+      "components": [
+        {
+          "component": "theory",
+          "sections": [
+            {
+              "section": 1,
+              "instructor": "Dr. Öğr. Üyesi Hüseyin Temuçin",
+              "room": "MÜH-BİL-416",
+              "slots": [
+                { "day": "Perşembe", "start": "13:30", "end": "15:20" }
+              ]
+            },
+            {
+              "section": 2,
+              "instructor": "Dr. Öğr. Üyesi Hüseyin Temuçin",
+              "room": "MÜH-BİL-416",
+              "slots": [
+                { "day": "Perşembe", "start": "15:30", "end": "17:20" }
+              ]
+            }
+          ]
+        },
+        {
+          "component": "lab",
+          "sections": [
+            {
+              "section": 1,
+              "instructor": "Dr. Öğr. Üyesi Sinem Tuğba Şahin Tekin",
+              "room": "MÜH-BİL-400",
+              "slots": [
+                { "day": "Pazartesi", "start": "10:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 2,
+              "instructor": "Dr. Öğr. Üyesi Sinem Tuğba Şahin Tekin",
+              "room": "MÜH-BİL-400",
+              "slots": [
+                { "day": "Pazartesi", "start": "13:30", "end": "15:20" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "BM103",
+      "name": "Bilgisayar Mühendisliğinin Temelleri",
+      "type": "departmental",
+      "components": [
+        {
+          "component": "theory",
+          "sections": [
+            {
+              "section": 1,
+              "instructor": "Doç. Dr. Feyza Yıldırım Okay",
+              "room": "MÜH-BİL-402",
+              "slots": [
+                { "day": "Çarşamba", "start": "10:30", "end": "13:20" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "MAT199",
+      "name": "Lineer Cebir",
+      "type": "common",
+      "components": [
+        {
+          "component": "theory",
+          "sections": [
+            {
+              "section": 1,
+              "instructor": "Prof. Dr. Şerife Büyükköse",
+              "room": "MÜH-BİL-418",
+              "slots": [
+                { "day": "Salı", "start": "09:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 2,
+              "instructor": "Prof. Dr. Şerife Büyükköse",
+              "room": "MÜH-BİL-418",
+              "slots": [
+                { "day": "Salı", "start": "13:30", "end": "16:20" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "FIZ103",
+      "name": "Fizik I",
+      "type": "common",
+      "components": [
+        {
+          "component": "theory",
+          "sections": [
+            {
+              "section": 1,
+              "instructor": "Doç. Dr. Esra Erbilen Tanrıkulu",
+              "room": "MÜH-ORT-DERS-119",
+              "slots": [
+                { "day": "Pazartesi", "start": "13:30", "end": "15:20" },
+                { "day": "Çarşamba", "start": "08:30", "end": "10:20" }
+              ]
+            },
+            {
+              "section": 2,
+              "instructor": "Doç. Dr. Hilal Küçük",
+              "room": "MÜH-ORT-DERS-117",
+              "slots": [
+                { "day": "Pazartesi", "start": "13:30", "end": "15:20" },
+                { "day": "Çarşamba", "start": "08:30", "end": "10:20" }
+              ]
+            },
+            {
+              "section": 3,
+              "instructor": "Doç. Dr. Esra Erbilen Tanrıkulu",
+              "room": "MÜH-ORT-DERS-119",
+              "slots": [
+                { "day": "Pazartesi", "start": "15:30", "end": "17:20" },
+                { "day": "Çarşamba", "start": "10:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 4,
+              "instructor": "Doç. Dr. Hilal Küçük",
+              "room": "MÜH-ORT-DERS-117",
+              "slots": [
+                { "day": "Pazartesi", "start": "15:30", "end": "17:20" },
+                { "day": "Çarşamba", "start": "10:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 5,
+              "instructor": "Prof. Dr. Yunus Özen",
+              "room": "MÜH-ORT-DERS-119",
+              "slots": [
+                { "day": "Salı", "start": "08:30", "end": "10:20" },
+                { "day": "Perşembe", "start": "13:30", "end": "15:20" }
+              ]
+            },
+            {
+              "section": 6,
+              "instructor": "Dr. Öğr. Üyesi Kıvanç Uyanık",
+              "room": "MÜH-ORT-DERS-117",
+              "slots": [
+                { "day": "Salı", "start": "08:30", "end": "10:20" },
+                { "day": "Perşembe", "start": "13:30", "end": "15:20" }
+              ]
+            },
+            {
+              "section": 7,
+              "instructor": "Prof. Dr. Yunus Özen",
+              "room": "MÜH-ORT-DERS-119",
+              "slots": [
+                { "day": "Salı", "start": "10:30", "end": "12:20" },
+                { "day": "Perşembe", "start": "15:30", "end": "17:20" }
+              ]
+            },
+            {
+              "section": 8,
+              "instructor": "Dr. Öğr. Üyesi Kıvanç Uyanık",
+              "room": "MÜH-ORT-DERS-117",
+              "slots": [
+                { "day": "Salı", "start": "10:30", "end": "12:20" },
+                { "day": "Perşembe", "start": "15:30", "end": "17:20" }
+              ]
+            },
+            {
+              "section": 9,
+              "instructor": "Doç. Dr. Ali Emre Genç",
+              "room": "MÜH-ORT-DERS-117",
+              "slots": [
+                { "day": "Çarşamba", "start": "13:30", "end": "15:20" },
+                { "day": "Cuma", "start": "08:30", "end": "10:20" }
+              ]
+            },
+            {
+              "section": 10,
+              "instructor": "Doç. Dr. Aycan Özkan",
+              "room": "MÜH-ORT-DERS-119",
+              "slots": [
+                { "day": "Salı", "start": "14:30", "end": "15:20" },
+                { "day": "Perşembe", "start": "08:30", "end": "10:20" }
+              ]
+            },
+            {
+              "section": 11,
+              "instructor": "Doç. Dr. Ali Emre Genç",
+              "room": "MÜH-ORT-DERS-117",
+              "slots": [
+                { "day": "Çarşamba", "start": "15:30", "end": "17:20" },
+                { "day": "Cuma", "start": "10:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 12,
+              "instructor": "Doç. Dr. Aycan Özkan",
+              "room": "MÜH-ORT-DERS-119",
+              "slots": [
+                { "day": "Salı", "start": "15:30", "end": "17:20" },
+                { "day": "Perşembe", "start": "10:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 13,
+              "instructor": "Doç. Dr. Aycan Özkan",
+              "room": "MÜH-ORT-DERS-224",
+              "slots": [
+                { "day": "Çarşamba", "start": "08:30", "end": "10:20" },
+                { "day": "Cuma", "start": "13:30", "end": "15:20" }
+              ]
+            },
+            {
+              "section": 14,
+              "instructor": "Doç. Dr. Aycan Özkan",
+              "room": "MÜH-ORT-DERS-224",
+              "slots": [
+                { "day": "Çarşamba", "start": "10:30", "end": "12:20" },
+                { "day": "Cuma", "start": "15:30", "end": "17:20" }
+              ]
+            },
+            {
+              "section": 15,
+              "instructor": "Dr. Öğr. Üyesi Mahmut Bucurgat",
+              "room": "MÜH-ORT-DERS-119",
+              "slots": [
+                { "day": "Çarşamba", "start": "13:30", "end": "15:20" },
+                { "day": "Cuma", "start": "08:30", "end": "10:20" }
+              ]
+            },
+            {
+              "section": 16,
+              "instructor": "Dr. Öğr. Üyesi Mahmut Bucurgat",
+              "room": "MÜH-ORT-DERS-119",
+              "slots": [
+                { "day": "Çarşamba", "start": "15:30", "end": "17:20" },
+                { "day": "Cuma", "start": "10:30", "end": "12:20" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "MATH101",
+      "name": "Mathematics I",
+      "type": "common",
+      "components": [
+        {
+          "component": "theory",
+          "sections": [
+            {
+              "section": 1,
+              "instructor": "Arş. Gör. Dr. Rümeysa Sacide Altınkaya",
+              "room": "MÜH-ORT-DERS-122",
+              "slots": [
+                { "day": "Pazartesi", "start": "10:30", "end": "12:20" },
+                { "day": "Çarşamba", "start": "10:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 2,
+              "instructor": "Doç. Dr. Anıl Altınkaya",
+              "room": "MÜH-ORT-DERS-410",
+              "slots": [
+                { "day": "Pazartesi", "start": "10:30", "end": "12:20" },
+                { "day": "Çarşamba", "start": "13:30", "end": "15:20" }
+              ]
+            },
+            {
+              "section": 3,
+              "instructor": "Arş. Gör. Dr. Rümeysa Sacide Altınkaya",
+              "room": "MÜH-ORT-DERS-122",
+              "slots": [
+                { "day": "Pazartesi", "start": "13:30", "end": "15:20" },
+                { "day": "Çarşamba", "start": "15:30", "end": "17:20" }
+              ]
+            },
+            {
+              "section": 4,
+              "instructor": "Doç. Dr. Anıl Altınkaya",
+              "room": "MÜH-ORT-DERS-410",
+              "slots": [
+                { "day": "Pazartesi", "start": "13:30", "end": "15:20" },
+                { "day": "Çarşamba", "start": "15:30", "end": "17:20" }
+              ]
+            },
+            {
+              "section": 5,
+              "instructor": "Arş. Gör. Dr. Rümeysa Sacide Altınkaya",
+              "room": "MÜH-ORT-DERS-122",
+              "slots": [
+                { "day": "Pazartesi", "start": "15:30", "end": "17:20" },
+                { "day": "Çarşamba", "start": "13:30", "end": "15:20" }
+              ]
+            },
+            {
+              "section": 6,
+              "instructor": "Dr. Öğr. Üyesi Çetin Cemal Özken",
+              "room": "MÜH-ORT-DERS-122",
+              "slots": [
+                { "day": "Salı", "start": "08:30", "end": "10:20" },
+                { "day": "Perşembe", "start": "13:30", "end": "15:20" }
+              ]
+            },
+            {
+              "section": 7,
+              "instructor": "Dr. Öğr. Üyesi Sezin Çit",
+              "room": "MÜH-ORT-DERS-410",
+              "slots": [
+                { "day": "Salı", "start": "08:30", "end": "10:20" },
+                { "day": "Perşembe", "start": "13:30", "end": "15:20" }
+              ]
+            },
+            {
+              "section": 8,
+              "instructor": "Dr. Öğr. Üyesi Çetin Cemal Özken",
+              "room": "MÜH-ORT-DERS-122",
+              "slots": [
+                { "day": "Salı", "start": "10:30", "end": "12:20" },
+                { "day": "Perşembe", "start": "10:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 9,
+              "instructor": "Dr. Öğr. Üyesi Sezin Çit",
+              "room": "MÜH-ORT-DERS-410",
+              "slots": [
+                { "day": "Salı", "start": "10:30", "end": "12:20" },
+                { "day": "Perşembe", "start": "15:30", "end": "17:20" }
+              ]
+            },
+            {
+              "section": 10,
+              "instructor": "Dr. Öğr. Üyesi Çetin Cemal Özken",
+              "room": "MÜH-ORT-DERS-122",
+              "slots": [
+                { "day": "Salı", "start": "13:30", "end": "15:20" },
+                { "day": "Perşembe", "start": "08:30", "end": "10:20" }
+              ]
+            },
+            {
+              "section": 11,
+              "instructor": "Doç. Mustafa Aslantaş",
+              "room": "MÜH-ORT-DERS-410",
+              "slots": [
+                { "day": "Salı", "start": "13:30", "end": "15:20" },
+                { "day": "Perşembe", "start": "08:30", "end": "10:20" }
+              ]
+            },
+            {
+              "section": 12,
+              "instructor": "Arş. Gör. Dr. Bilge Zehra Sergi Yılmaz",
+              "room": "MÜH-ORT-DERS-115",
+              "slots": [
+                { "day": "Salı", "start": "13:30", "end": "15:20" },
+                { "day": "Cuma", "start": "13:30", "end": "15:20" }
+              ]
+            },
+            {
+              "section": 13,
+              "instructor": "Doç. Mustafa Aslantaş",
+              "room": "MÜH-ORT-DERS-410",
+              "slots": [
+                { "day": "Salı", "start": "15:30", "end": "17:20" },
+                { "day": "Perşembe", "start": "10:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 14,
+              "instructor": "Dr. Öğr. Üyesi Emre Sevgi",
+              "room": "MÜH-ORT-DERS-410",
+              "slots": [
+                { "day": "Çarşamba", "start": "10:30", "end": "12:20" },
+                { "day": "Cuma", "start": "13:30", "end": "15:20" }
+              ]
+            },
+            {
+              "section": 15,
+              "instructor": "Dr. Öğr. Üyesi Emre Sevgi",
+              "room": "MÜH-ORT-DERS-209",
+              "slots": [
+                { "day": "Çarşamba", "start": "13:30", "end": "15:20" },
+                { "day": "Cuma", "start": "10:30", "end": "12:20" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "ENG103",
+      "name": "English I",
+      "type": "common",
+      "components": [
+        {
+          "component": "theory",
+          "sections": [
+            {
+              "section": 1,
+              "instructor": "Öğr. Gör. Aslı Islıkaye",
+              "room": "MÜH-ORT-DERS-117",
+              "slots": [
+                { "day": "Pazartesi", "start": "09:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 2,
+              "instructor": "Öğr. Gör. Mehmet Değirmenci",
+              "room": "MÜH-ORT-DERS-210",
+              "slots": [
+                { "day": "Pazartesi", "start": "09:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 3,
+              "instructor": "Öğr. Gör. Aslı Islıkaye",
+              "room": "MÜH-ORT-DERS-211",
+              "slots": [
+                { "day": "Pazartesi", "start": "13:30", "end": "16:20" }
+              ]
+            },
+            {
+              "section": 4,
+              "instructor": "Öğr. Gör. Mehmet Değirmenci",
+              "room": "MÜH-ORT-DERS-210",
+              "slots": [
+                { "day": "Pazartesi", "start": "13:30", "end": "16:20" }
+              ]
+            },
+            {
+              "section": 5,
+              "instructor": "Öğr. Gör. Aslı Islıkaye",
+              "room": "MÜH-ORT-DERS-224",
+              "slots": [
+                { "day": "Salı", "start": "09:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 6,
+              "instructor": "Öğr. Gör. Mehmet Değirmenci",
+              "room": "MÜH-ORT-DERS-210",
+              "slots": [
+                { "day": "Salı", "start": "09:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 7,
+              "instructor": "Öğr. Gör. Aslı Islıkaye",
+              "room": "MÜH-ORT-DERS-224",
+              "slots": [
+                { "day": "Salı", "start": "13:30", "end": "15:20" }
+              ]
+            },
+            {
+              "section": 8,
+              "instructor": "Öğr. Gör. Mehmet Değirmenci",
+              "room": "MÜH-ORT-DERS-210",
+              "slots": [
+                { "day": "Salı", "start": "13:30", "end": "15:20" }
+              ]
+            },
+            {
+              "section": 9,
+              "instructor": "Öğr. Gör. Aslı Islıkaye",
+              "room": "MÜH-ORT-DERS-224",
+              "slots": [
+                { "day": "Çarşamba", "start": "13:30", "end": "16:20" }
+              ]
+            },
+            {
+              "section": 10,
+              "instructor": "Öğr. Gör. Mehmet Değirmenci",
+              "room": "MÜH-ORT-DERS-210",
+              "slots": [
+                { "day": "Çarşamba", "start": "13:30", "end": "16:20" }
+              ]
+            },
+            {
+              "section": 11,
+              "instructor": "Öğr. Gör. Aslı Islıkaye",
+              "room": "MÜH-ORT-DERS-224",
+              "slots": [
+                { "day": "Perşembe", "start": "09:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 12,
+              "instructor": "Öğr. Gör. Aslı Islıkaye",
+              "room": "MÜH-ORT-DERS-224",
+              "slots": [
+                { "day": "Perşembe", "start": "13:30", "end": "16:20" }
+              ]
+            },
+            {
+              "section": 13,
+              "instructor": "Öğr. Gör. Mehmet Değirmenci",
+              "room": "MÜH-ORT-DERS-115",
+              "slots": [
+                { "day": "Cuma", "start": "09:30", "end": "12:20" }
+              ]
+            },
+            {
+              "section": 14,
+              "instructor": "Öğr. Gör. Mehmet Değirmenci",
+              "room": "MÜH-ORT-DERS-115",
+              "slots": [
+                { "day": "Cuma", "start": "13:30", "end": "16:20" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "TAR101",
+      "name": "Atatürk İlkeleri ve İnkılap Tarihi I",
+      "type": "common",
+      "components": [
+        {
+          "component": "theory",
+          "sections": [
+            {
+              "section": 3,
+              "instructor": "Dr. Serpil Asar",
+              "room": "UZAKTAN",
+              "slots": [
+                { "day": "Çarşamba", "start": "17:30", "end": "19:20" }
+              ]
+            },
+            {
+              "section": 4,
+              "instructor": "Dr. Serpil Asar",
+              "room": "UZAKTAN",
+              "slots": [
+                { "day": "Çarşamba", "start": "19:30", "end": "21:20" }
+              ]
+            },
+            {
+              "section": 5,
+              "instructor": "Dr. Serpil Asar",
+              "room": "UZAKTAN",
+              "slots": [
+                { "day": "Perşembe", "start": "17:30", "end": "19:20" }
+              ]
+            },
+            {
+              "section": 6,
+              "instructor": "Öğr. Gör. Mehmet Akif Bal",
+              "room": "UZAKTAN",
+              "slots": [
+                { "day": "Perşembe", "start": "17:30", "end": "19:20" }
+              ]
+            },
+            {
+              "section": 7,
+              "instructor": "Öğr. Gör. Mehmet Akif Bal",
+              "room": "UZAKTAN",
+              "slots": [
+                { "day": "Perşembe", "start": "19:30", "end": "21:20" }
+              ]
+            },
+            {
+              "section": 8,
+              "instructor": "Öğr. Gör. Mehmet Akif Bal",
+              "room": "UZAKTAN",
+              "slots": [
+                { "day": "Cuma", "start": "17:30", "end": "19:20" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2782 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gazi Üniversitesi — Ders Programı Optimizasyonu</title>
+  <meta name="description" content="Gazi Üniversitesi Bilgisayar Mühendisliği sıfır çakışmalı ders programı optimizasyon ve hoca filtreleme aracı." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- React 18 Production UMD -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+
+  <!-- Dışa aktarma kütüphaneleri -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+/* ============================================
+   DESIGN SYSTEM: DARK & LIGHT THEMES
+   ============================================ */
+:root, [data-theme="dark"], body.dark {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1a2235;
+  --bg-card: rgba(17, 25, 45, 0.75);
+  --bg-card-solid: #11192d;
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --bg-glass-hover: rgba(255, 255, 255, 0.06);
+  --bg-popover: #151d32;
+
+  --border-primary: rgba(255, 255, 255, 0.07);
+  --border-secondary: rgba(255, 255, 255, 0.12);
+  --border-accent: rgba(99, 102, 241, 0.4);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  --text-muted: #475569;
+
+  --accent-primary: #6366f1;
+  --accent-primary-light: #818cf8;
+  --accent-secondary: #8b5cf6;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+  --accent-info: #06b6d4;
+
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+  --gradient-glow: radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.18) 0%, transparent 60%);
+  --gradient-card: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.02) 100%);
+
+  --table-bg: rgba(10, 14, 26, 0.55);
+  --table-header-bg: rgba(99, 102, 241, 0.07);
+  --input-bg: rgba(0, 0, 0, 0.35);
+  --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="light"], body.light {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.94);
+  --bg-card-solid: #ffffff;
+  --bg-glass: rgba(0, 0, 0, 0.02);
+  --bg-glass-hover: rgba(0, 0, 0, 0.05);
+  --bg-popover: #ffffff;
+
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --border-accent: rgba(79, 70, 229, 0.3);
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --text-muted: #94a3b8;
+
+  --accent-primary: #4f46e5;
+  --accent-primary-light: #4338ca;
+  --accent-secondary: #7c3aed;
+  --accent-success: #059669;
+  --accent-warning: #d97706;
+  --accent-danger: #dc2626;
+  --accent-info: #0891b2;
+
+  --gradient-primary: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
+  --gradient-glow: radial-gradient(ellipse at 50% 0%, rgba(79, 70, 229, 0.1) 0%, transparent 60%);
+  --gradient-card: linear-gradient(135deg, rgba(79, 70, 229, 0.04) 0%, rgba(124, 58, 237, 0.01) 100%);
+
+  --table-bg: #ffffff;
+  --table-header-bg: #f8fafc;
+  --input-bg: #f8fafc;
+  --shadow-panel: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+:root {
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 9999px;
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-family); background: var(--bg-primary); color: var(--text-primary);
+  min-height: 100vh; line-height: 1.6; overflow-x: hidden;
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+body::before {
+  content: ''; position: fixed; top: 0; left: 0; right: 0; height: 500px;
+  background: var(--gradient-glow); pointer-events: none; z-index: 0;
+  transition: background var(--transition-base);
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.35); border-radius: var(--radius-full); }
+
+.app { max-width: 1580px; margin: 0 auto; padding: 24px; position: relative; z-index: 1; }
+
+/* Header & Theme Toggle */
+.header { text-align: center; padding: 32px 20px 20px; }
+.header-top-bar {
+  display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 12px;
+}
+.header__badge {
+  display: inline-flex; align-items: center; gap: 8px; padding: 5px 16px;
+  background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: var(--radius-full); font-size: 0.72rem; font-weight: 600;
+  color: var(--accent-primary-light); text-transform: uppercase; letter-spacing: 1.5px;
+}
+.header__badge-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--accent-success);
+  box-shadow: 0 0 8px var(--accent-success);
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+
+.theme-toggle-btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px;
+  border-radius: var(--radius-full); border: 1px solid var(--border-secondary);
+  background: var(--bg-card); color: var(--text-primary); font-family: var(--font-family);
+  font-size: 0.74rem; font-weight: 600; cursor: pointer; transition: all var(--transition-fast);
+  user-select: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.theme-toggle-btn:hover {
+  border-color: var(--accent-primary); background: var(--bg-glass-hover);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.25); transform: translateY(-1px);
+}
+.theme-toggle-btn:active { transform: translateY(0); }
+.theme-toggle-icon { font-size: 0.95rem; line-height: 1; }
+
+.header__title {
+  font-size: 2.2rem; font-weight: 800; background: var(--gradient-primary);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 6px; letter-spacing: -0.5px;
+}
+.header__subtitle { font-size: 0.92rem; color: var(--text-secondary); max-width: 720px; margin: 0 auto; }
+
+/* Layout */
+.main-layout { display: grid; grid-template-columns: 360px 1fr; gap: 24px; align-items: start; }
+@media (max-width: 1140px) { .main-layout { grid-template-columns: 1fr; } }
+.sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+/* Panel */
+.panel {
+  background: var(--bg-card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-primary); border-radius: var(--radius-lg); overflow: hidden;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), background var(--transition-base);
+  box-shadow: var(--shadow-panel);
+}
+.panel:hover { border-color: var(--border-secondary); }
+.panel__header {
+  padding: 14px 20px; border-bottom: 1px solid var(--border-primary);
+  display: flex; align-items: center; gap: 12px;
+}
+.panel__icon {
+  width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--gradient-primary);
+  display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3); color: white;
+}
+.panel__title { font-size: 0.95rem; font-weight: 700; }
+.panel__badge {
+  margin-left: auto; font-size: 0.68rem; padding: 2px 8px; border-radius: var(--radius-full);
+  background: rgba(99, 102, 241, 0.15); color: var(--accent-primary-light); font-weight: 600;
+}
+.panel__body { padding: 18px 20px; }
+
+/* Tags */
+.course-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.course-tag {
+  display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+  border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 600; border: 1px solid;
+}
+.course-tag--loaded { background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: var(--accent-success); }
+
+/* Day Checkboxes */
+.constraint-group__label {
+  font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text-tertiary); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+}
+.day-checkboxes { display: flex; flex-wrap: wrap; gap: 6px; }
+.day-cb { position: relative; }
+.day-cb input { position: absolute; opacity: 0; pointer-events: none; }
+.day-cb label {
+  display: flex; align-items: center; justify-content: center; min-width: 50px;
+  padding: 7px 10px; border-radius: var(--radius-md); border: 1px solid var(--border-secondary);
+  background: var(--bg-glass); font-size: 0.72rem; font-weight: 600; color: var(--text-secondary);
+  cursor: pointer; transition: all var(--transition-fast); user-select: none;
+}
+.day-cb label:hover { border-color: var(--accent-primary); color: var(--text-primary); }
+.day-cb input:checked + label {
+  background: rgba(99, 102, 241, 0.18); border-color: var(--accent-primary);
+  color: var(--accent-primary-light); box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+}
+
+/* Friday toggle */
+.friday-toggle {
+  display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+  background: var(--gradient-card); border: 1px solid var(--border-primary); border-radius: var(--radius-md);
+  margin-top: 12px;
+}
+.friday-toggle__label { font-size: 0.78rem; color: var(--text-secondary); flex: 1; font-weight: 500; }
+.toggle-switch { position: relative; width: 42px; height: 22px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-switch__slider {
+  position: absolute; cursor: pointer; inset: 0; background: rgba(125, 125, 125, 0.25);
+  border-radius: var(--radius-full); transition: var(--transition-base);
+}
+.toggle-switch__slider::before {
+  content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px;
+  background: white; border-radius: 50%; transition: var(--transition-base);
+}
+.toggle-switch input:checked + .toggle-switch__slider { background: var(--accent-primary); }
+.toggle-switch input:checked + .toggle-switch__slider::before { transform: translateX(20px); }
+
+/* Instructor Filtering Panel */
+.instructor-filters-wrapper {
+  max-height: 480px; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 12px;
+  overscroll-behavior: contain;
+}
+.course-filter-card {
+  background: var(--bg-glass); border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md); padding: 10px 12px; transition: border-color var(--transition-fast);
+}
+.course-filter-card:hover { border-color: rgba(99, 102, 241, 0.3); }
+.course-filter-card__header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+}
+.course-filter-card__title {
+  font-size: 0.78rem; font-weight: 700; color: var(--accent-primary-light);
+  display: flex; align-items: center; gap: 6px;
+}
+.course-filter-card__sub {
+  font-size: 0.65rem; color: var(--text-tertiary); font-weight: normal; margin-left: 4px;
+}
+.course-filter-card__actions { display: flex; gap: 6px; }
+.btn-text-action {
+  background: none; border: none; font-size: 0.65rem; color: var(--text-tertiary);
+  cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: all var(--transition-fast);
+}
+.btn-text-action:hover { color: var(--accent-primary-light); background: rgba(99, 102, 241, 0.1); }
+.instructor-list { display: flex; flex-direction: column; gap: 5px; }
+.instructor-item {
+  display: flex; align-items: center; gap: 8px; font-size: 0.73rem;
+  color: var(--text-secondary); cursor: pointer; padding: 4px 6px;
+  border-radius: var(--radius-sm); transition: background var(--transition-fast);
+  user-select: none;
+}
+.instructor-item:hover { background: var(--bg-glass-hover); color: var(--text-primary); }
+.instructor-item input[type="checkbox"] {
+  accent-color: var(--accent-primary); width: 14px; height: 14px; cursor: pointer;
+}
+.instructor-item__name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.instructor-item__sections {
+  font-size: 0.62rem; color: var(--text-tertiary); padding: 1px 5px;
+  background: var(--bg-glass); border-radius: 4px; font-variant-numeric: tabular-nums;
+}
+
+/* Button */
+.btn-generate {
+  width: 100%; padding: 13px 20px; border: none; border-radius: var(--radius-md);
+  background: var(--gradient-primary); color: white; font-family: var(--font-family);
+  font-size: 0.92rem; font-weight: 700; cursor: pointer; transition: all var(--transition-base);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35); position: relative; overflow: hidden; letter-spacing: 0.3px;
+}
+.btn-generate:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(99, 102, 241, 0.5); }
+.btn-generate:active { transform: translateY(0); }
+.btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Stats Grid */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+@media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+.stat-card {
+  padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-primary);
+  background: var(--gradient-card); text-align: center;
+}
+.stat-card__value { font-size: 1.25rem; font-weight: 800; color: var(--accent-primary-light); }
+.stat-card__label { font-size: 0.68rem; color: var(--text-tertiary); margin-top: 2px; }
+
+/* Advanced Pagination Bar */
+.pagination-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 10px 14px; background: var(--bg-glass);
+  border: 1px solid var(--border-primary); border-radius: var(--radius-md); margin-bottom: 16px;
+}
+.pagination-controls { display: flex; align-items: center; gap: 6px; }
+.btn-nav-page {
+  min-width: 36px; height: 36px; padding: 0 8px; border-radius: var(--radius-md);
+  border: 1px solid var(--border-secondary); background: var(--bg-card);
+  color: var(--text-secondary); font-size: 0.78rem; font-weight: 700; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; transition: all var(--transition-fast);
+  user-select: none;
+}
+.btn-nav-page:hover:not(:disabled) {
+  border-color: var(--accent-primary); color: var(--accent-primary-light);
+  background: rgba(99, 102, 241, 0.12); box-shadow: 0 0 12px rgba(99, 102, 241, 0.2);
+}
+.btn-nav-page:disabled { opacity: 0.25; cursor: not-allowed; }
+.page-jump-wrapper {
+  display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-secondary); font-weight: 500;
+}
+.page-input {
+  width: 58px; height: 36px; text-align: center; background: var(--input-bg);
+  border: 1px solid var(--border-secondary); border-radius: var(--radius-sm);
+  color: var(--accent-primary-light); font-weight: 700; font-size: 0.9rem;
+  transition: border-color var(--transition-fast); outline: none; font-family: var(--font-family);
+}
+.page-input:focus { border-color: var(--accent-primary); box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
+.page-total { color: var(--text-tertiary); font-size: 0.8rem; font-weight: 600; }
+
+/* Export Dropdown */
+.export-dropdown-wrapper { position: relative; }
+.btn-export-main {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
+  border-radius: var(--radius-md); border: 1px solid var(--border-accent);
+  background: rgba(99, 102, 241, 0.15); color: var(--accent-primary-light);
+  font-family: var(--font-family); font-size: 0.78rem; font-weight: 700; cursor: pointer;
+  transition: all var(--transition-fast); user-select: none;
+}
+.btn-export-main:hover {
+  background: rgba(99, 102, 241, 0.28); border-color: var(--accent-primary);
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.25);
+}
+.export-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); min-width: 220px;
+  background: var(--bg-popover); border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md); box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+  padding: 6px; z-index: 100; display: none; flex-direction: column; gap: 2px;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  animation: fadeIn 0.15s ease-out;
+}
+.export-menu.show { display: flex; }
+.export-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+  border-radius: var(--radius-sm); color: var(--text-secondary);
+  font-size: 0.75rem; font-weight: 600; text-decoration: none; cursor: pointer;
+  background: transparent; border: none; width: 100%; text-align: left;
+  transition: all var(--transition-fast);
+}
+.export-item:hover { background: rgba(99, 102, 241, 0.15); color: var(--text-primary); }
+.export-item__icon { font-size: 1.1rem; width: 22px; text-align: center; }
+.export-item__desc { font-size: 0.65rem; color: var(--text-tertiary); font-weight: normal; margin-left: auto; }
+
+/* Score Bar */
+.score-bar { height: 5px; background: rgba(125, 125, 125, 0.15); border-radius: var(--radius-full); overflow: hidden; margin-top: 6px; }
+.score-bar__fill { height: 100%; border-radius: var(--radius-full); transition: width 350ms; }
+.score-bar__fill--excellent { background: var(--accent-success); box-shadow: 0 0 10px var(--accent-success); }
+.score-bar__fill--good { background: var(--accent-info); }
+.score-bar__fill--fair { background: var(--accent-warning); }
+
+/* Schedule Table */
+.schedule-container {
+  overflow-x: auto; border-radius: var(--radius-md);
+  border: 1px solid var(--border-primary); background: var(--table-bg);
+}
+.schedule-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 750px; }
+.schedule-table th {
+  padding: 12px 10px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--text-tertiary); background: var(--table-header-bg);
+  border-bottom: 1px solid var(--border-primary); position: sticky; top: 0; z-index: 10; text-align: center;
+}
+.schedule-table th:first-child { text-align: right; padding-right: 14px; width: 85px; }
+.schedule-table td {
+  padding: 3px; border-bottom: 1px solid var(--border-primary);
+  border-right: 1px solid var(--border-primary); height: 42px;
+  vertical-align: top; position: relative;
+}
+.schedule-table td:first-child {
+  text-align: right; padding-right: 12px; font-size: 0.68rem; color: var(--text-muted);
+  font-weight: 600; font-variant-numeric: tabular-nums; vertical-align: middle; white-space: nowrap;
+  border-right: 1px solid var(--border-primary); background: var(--bg-glass);
+}
+
+/* Course Block */
+.course-block {
+  border-radius: var(--radius-sm); padding: 6px 8px; font-size: 0.7rem; line-height: 1.35;
+  overflow: hidden; cursor: pointer; transition: all var(--transition-fast);
+  border: 1px solid transparent; min-height: 100%; display: flex; flex-direction: column;
+  justify-content: flex-start; position: relative;
+}
+.course-block:hover {
+  transform: translateY(-2px) scale(1.015); z-index: 20;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 16px rgba(99, 102, 241, 0.25);
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+.course-block__code { font-weight: 800; font-size: 0.72rem; letter-spacing: 0.4px; display: flex; align-items: center; justify-content: space-between; }
+.course-block__section { font-weight: 600; opacity: 0.9; font-size: 0.65rem; margin-top: 1px; }
+.course-block__instructor { font-size: 0.62rem; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.course-block__time { font-size: 0.58rem; opacity: 0.65; font-variant-numeric: tabular-nums; margin-top: auto; }
+
+/* Grouped / Alternative Section Badge */
+.course-block__alt-badge {
+  display: inline-flex; align-items: center; gap: 3px; font-size: 0.58rem;
+  font-weight: 700; padding: 1px 4px; border-radius: 4px;
+  background: rgba(245, 158, 11, 0.25); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.45);
+  margin-top: 3px; letter-spacing: 0.2px; width: fit-content;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
+}
+
+/* Course colors in Dark Mode */
+.course-block--0 { background: rgba(99, 102, 241, 0.18); border-color: rgba(99, 102, 241, 0.35); color: #c7d2fe; }
+.course-block--1 { background: rgba(139, 92, 246, 0.18); border-color: rgba(139, 92, 246, 0.35); color: #ddd6fe; }
+.course-block--2 { background: rgba(6, 182, 212, 0.18); border-color: rgba(6, 182, 212, 0.35); color: #a5f3fc; }
+.course-block--3 { background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.35); color: #a7f3d0; }
+.course-block--4 { background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.35); color: #fde68a; }
+.course-block--5 { background: rgba(239, 68, 68, 0.18); border-color: rgba(239, 68, 68, 0.35); color: #fecaca; }
+.course-block--6 { background: rgba(236, 72, 153, 0.18); border-color: rgba(236, 72, 153, 0.35); color: #fbcfe8; }
+
+/* Course colors in Light Mode */
+[data-theme="light"] .course-block--0, body.light .course-block--0 { background: #e0e7ff; border-color: #a5b4fc; color: #312e81; }
+[data-theme="light"] .course-block--1, body.light .course-block--1 { background: #ede9fe; border-color: #c4b5fd; color: #4c1d95; }
+[data-theme="light"] .course-block--2, body.light .course-block--2 { background: #cffafe; border-color: #67e8f9; color: #164e63; }
+[data-theme="light"] .course-block--3, body.light .course-block--3 { background: #d1fae5; border-color: #6ee7b7; color: #064e3b; }
+[data-theme="light"] .course-block--4, body.light .course-block--4 { background: #fef3c7; border-color: #fcd34d; color: #78350f; }
+[data-theme="light"] .course-block--5, body.light .course-block--5 { background: #fee2e2; border-color: #fca5a5; color: #7f1d1d; }
+[data-theme="light"] .course-block--6, body.light .course-block--6 { background: #fce7f3; border-color: #f9a8d4; color: #831843; }
+
+/* Interactive Tooltip / Popover */
+.popover-card {
+  position: fixed; z-index: 1000; min-width: 280px; max-width: 360px;
+  background: var(--bg-popover); border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md); padding: 14px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  pointer-events: auto; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  animation: popoverFadeIn 0.18s cubic-bezier(0, 0, 0.2, 1);
+}
+@keyframes popoverFadeIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.popover-card__header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  border-bottom: 1px solid var(--border-primary); padding-bottom: 8px; margin-bottom: 10px;
+}
+.popover-card__code { font-size: 0.95rem; font-weight: 800; color: var(--accent-primary-light); }
+.popover-card__name { font-size: 0.76rem; color: var(--text-secondary); margin-top: 2px; }
+.popover-card__close {
+  background: none; border: none; color: var(--text-tertiary); font-size: 1.1rem;
+  cursor: pointer; line-height: 1; padding: 2px;
+}
+.popover-card__close:hover { color: var(--text-primary); }
+.popover-card__row { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; margin-bottom: 6px; }
+.popover-card__icon { width: 18px; text-align: center; color: var(--accent-primary-light); font-size: 0.85rem; }
+.popover-card__label { color: var(--text-tertiary); font-size: 0.72rem; min-width: 65px; }
+.popover-card__val { color: var(--text-primary); font-weight: 600; }
+.popover-card__alt-box {
+  margin-top: 10px; padding: 10px; border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25);
+}
+.popover-card__alt-title {
+  font-size: 0.72rem; font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 6px;
+  margin-bottom: 6px;
+}
+.popover-card__alt-item {
+  font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px; padding-left: 12px; position: relative;
+}
+.popover-card__alt-item::before { content: '•'; position: absolute; left: 2px; color: #fbbf24; }
+
+/* Empty State */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px; text-align: center; }
+.empty-state__icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.35; }
+.empty-state__title { font-size: 1.15rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; }
+.empty-state__text { font-size: 0.82rem; color: var(--text-tertiary); max-width: 380px; }
+
+/* Compact label */
+.compact-label {
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px;
+  border-radius: var(--radius-full); font-size: 0.68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.compact-label--excellent { background: rgba(16, 185, 129, 0.18); color: var(--accent-success); border: 1px solid rgba(16, 185, 129, 0.3); }
+.compact-label--good { background: rgba(6, 182, 212, 0.18); color: var(--accent-info); border: 1px solid rgba(6, 182, 212, 0.3); }
+.compact-label--fair { background: rgba(245, 158, 11, 0.18); color: var(--accent-warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+/* Selection Tags */
+.sel-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.sel-tag {
+  padding: 3px 9px; border-radius: var(--radius-full); background: var(--bg-glass);
+  border: 1px solid var(--border-primary); font-size: 0.68rem; color: var(--text-secondary);
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.25s ease-out forwards; }
+
+/* ============================================
+   ENHANCED HEADER (3-BLOCK FLEXBOX LAYOUT)
+   ============================================ */
+.header-enhanced {
+  padding: 16px 24px 20px;
+  position: relative;
+}
+.header-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-primary);
+  margin-bottom: 20px;
+}
+
+/* Sol Alan: 1. Yarıyıl + Mock Dropdown */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 0%;
+  justify-content: flex-start;
+  min-width: 0;
+}
+.header-semester-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-success);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.header-dev-dropdown {
+  position: relative;
+  display: inline-flex;
+}
+.btn-dev-dropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px dashed var(--border-secondary);
+  background: var(--bg-glass);
+  color: var(--text-tertiary);
+  font-family: var(--font-family);
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+  white-space: nowrap;
+}
+.btn-dev-dropdown:hover {
+  border-color: var(--accent-warning);
+  color: var(--accent-warning);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+/* Merkez Alan: GAZİ ÜNİVERSİTESİ */
+.header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  pointer-events: auto;
+  white-space: nowrap;
+  padding: 0 12px;
+}
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  user-select: none;
+}
+.header-logo-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.35);
+  flex-shrink: 0;
+}
+.header-brand-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+}
+.header-brand-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+}
+
+/* Sağ Alan: Geri Sayım + Tarih + Tema Değiştirme (flex-row, items-center, gap-4/16px) */
+.header-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  flex: 1 1 0%;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+/* Geri Sayım Sayacı: Tek Satırda Ferah Tasarım */
+.header-countdown-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-glass);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-primary);
+  white-space: nowrap;
+}
+.header-countdown-label {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.header-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.countdown-unit {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+}
+.countdown-value {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--accent-primary-light);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.countdown-label-sub {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.countdown-separator {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 0 1px;
+}
+.countdown-expired {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-danger);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* Tarih Rozeti */
+.header-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Hero Başlık ve Alt Başlık */
+.header-hero {
+  text-align: center;
+  margin-top: 4px;
+}
+
+@media (max-width: 1050px) {
+  .header-brand-badge { display: none; }
+  .header-countdown-label { display: none; }
+  .header-right { gap: 10px; }
+}
+@media (max-width: 820px) {
+  .header-top-bar {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .header-center {
+    position: static;
+    transform: none;
+    order: -1;
+    margin-bottom: 4px;
+  }
+  .header-left, .header-right {
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}
+
+/* ============================================
+   TOAST NOTIFICATION
+   ============================================ */
+.toast-container {
+  position: fixed; top: 24px; right: 24px; z-index: 9999; pointer-events: none;
+}
+.toast {
+  pointer-events: auto; display: flex; align-items: center; gap: 10px;
+  padding: 12px 20px; border-radius: var(--radius-md);
+  background: var(--bg-popover); border: 1px solid var(--border-secondary);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35); backdrop-filter: blur(20px);
+  color: var(--text-primary); font-size: 0.82rem; font-weight: 600;
+  animation: toastSlideIn 0.3s ease-out forwards;
+  min-width: 280px;
+}
+.toast--warning {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: linear-gradient(135deg, var(--bg-popover) 0%, rgba(245, 158, 11, 0.06) 100%);
+}
+.toast__icon { font-size: 1.2rem; flex-shrink: 0; }
+.toast__text { flex: 1; }
+.toast__close {
+  background: none; border: none; color: var(--text-tertiary); font-size: 1rem;
+  cursor: pointer; padding: 2px 4px; opacity: 0.7; transition: opacity var(--transition-fast);
+}
+.toast__close:hover { opacity: 1; }
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes toastSlideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(40px); }
+}
+.toast--exiting { animation: toastSlideOut 0.25s ease-in forwards; }
+
+/* ============================================
+   SMART FILTERS PANEL
+   ============================================ */
+.smart-filters-list {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.smart-filter-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+  background: var(--gradient-card); border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md); transition: border-color var(--transition-fast);
+}
+.smart-filter-item:hover { border-color: var(--border-secondary); }
+.smart-filter-item__icon { font-size: 1.1rem; flex-shrink: 0; }
+.smart-filter-item__info { flex: 1; min-width: 0; }
+.smart-filter-item__name {
+  font-size: 0.76rem; font-weight: 600; color: var(--text-primary); line-height: 1.3;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px;
+}
+.smart-filter-item__tag {
+  display: inline-flex; align-items: center;
+  font-size: 0.62rem; font-weight: 600; color: var(--accent-warning);
+  background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-full); padding: 1px 7px;
+  letter-spacing: 0.2px; line-height: 1.4;
+}
+.smart-filter-item__desc {
+  font-size: 0.62rem; color: var(--text-tertiary); margin-top: 1px; line-height: 1.3;
+}
+.smart-filter-item--active {
+  border-color: rgba(99, 102, 241, 0.35);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.04) 100%);
+}
+
+/* Global Reset Button */
+.global-reset-wrapper {
+  margin-bottom: 12px;
+}
+.btn-global-reset {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  border: 1px dashed rgba(99, 102, 241, 0.38);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  user-select: none;
+}
+.btn-global-reset:hover {
+  border-color: var(--accent-primary);
+  border-style: solid;
+  background: var(--bg-glass-hover);
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.25);
+  transform: translateY(-1px);
+}
+.btn-global-reset:active {
+  transform: translateY(0);
+}
+.btn-global-reset__left {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.btn-global-reset__icon {
+  font-size: 0.95rem;
+  display: inline-block;
+  transition: transform var(--transition-fast);
+}
+.btn-global-reset:hover .btn-global-reset__icon {
+  transform: rotate(-180deg);
+}
+.btn-global-reset__badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: var(--accent-primary-light);
+  letter-spacing: 0.3px;
+}
+
+/* ============================================
+   BOOKMARK BUTTON & SAVED SCHEDULES
+   ============================================ */
+.btn-bookmark {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px;
+  border-radius: var(--radius-md); border: 1px solid var(--border-secondary);
+  background: var(--bg-glass); color: var(--text-secondary); font-family: var(--font-family);
+  font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all var(--transition-fast);
+  user-select: none;
+}
+.btn-bookmark:hover {
+  border-color: var(--accent-warning); color: var(--accent-warning);
+  background: rgba(245, 158, 11, 0.08);
+}
+.btn-bookmark--saved {
+  border-color: rgba(245, 158, 11, 0.5); color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+}
+.btn-bookmark--saved:hover {
+  background: rgba(245, 158, 11, 0.18);
+}
+
+.saved-panel { margin-top: 20px; }
+.saved-panel__header-row {
+  display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+  padding: 0 4px; user-select: none;
+}
+.saved-panel__toggle-icon {
+  font-size: 0.75rem; color: var(--text-tertiary); transition: transform var(--transition-fast);
+}
+.saved-panel__toggle-icon--open { transform: rotate(180deg); }
+.saved-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;
+  margin-top: 12px; animation: fadeIn 0.2s ease-out;
+}
+.saved-card {
+  padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-primary);
+  background: var(--gradient-card); cursor: pointer; transition: all var(--transition-fast);
+  position: relative;
+}
+.saved-card:hover {
+  border-color: var(--accent-primary); transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
+}
+.saved-card__title {
+  font-size: 0.78rem; font-weight: 700; color: var(--accent-primary-light); margin-bottom: 4px;
+}
+.saved-card__stats {
+  font-size: 0.65rem; color: var(--text-tertiary); display: flex; gap: 8px; flex-wrap: wrap;
+}
+.saved-card__remove {
+  position: absolute; top: 6px; right: 6px; background: none; border: none;
+  color: var(--text-muted); font-size: 0.85rem; cursor: pointer; padding: 2px 4px;
+  border-radius: 4px; transition: all var(--transition-fast); line-height: 1;
+}
+.saved-card__remove:hover { color: var(--accent-danger); background: rgba(239, 68, 68, 0.12); }
+.saved-empty {
+  text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.75rem;
+  font-style: italic;
+}
+
+/* ============================================
+   FOOTER SIGNATURE
+   ============================================ */
+.footer-signature {
+  text-align: center; padding: 24px 16px 32px; margin-top: 32px;
+  border-top: 1px solid var(--border-primary);
+}
+.footer-signature__text {
+  font-size: 0.78rem; color: var(--text-muted); font-weight: 400;
+  letter-spacing: 0.5px;
+}
+.footer-signature__name {
+  font-weight: 700; background: var(--gradient-primary);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  font-size: 0.88rem;
+}
+.footer-signature__year {
+  font-size: 0.62rem; color: var(--text-muted); margin-top: 4px; display: block;
+}
+
+/* ============================================
+   UPLOAD AREA
+   ============================================ */
+.upload-area {
+  border: 2px dashed var(--border-secondary); border-radius: var(--radius-md);
+  padding: 28px 16px; text-align: center; cursor: pointer;
+  transition: all var(--transition-fast); position: relative;
+}
+.upload-area.dragover { border-color: var(--accent-primary); background: rgba(99, 102, 241, 0.08); }
+.upload-area__icon { font-size: 2rem; margin-bottom: 8px; opacity: 0.5; }
+.upload-area__text { font-size: 0.8rem; color: var(--text-secondary); }
+.upload-area input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+
+/* Print Styles */
+@media print {
+  body { background: white !important; color: black !important; }
+  body::before, .header, .header-enhanced, .sidebar, .pagination-bar, .stats-grid, .score-bar, .popover-card, .btn-export-main, .toast-container, .footer-signature, .saved-panel { display: none !important; }
+  .app { max-width: 100% !important; padding: 0 !important; }
+  .panel { border: none !important; box-shadow: none !important; background: white !important; }
+  .schedule-container { border: 1px solid #ccc !important; }
+  .schedule-table th { background: #f0f0f0 !important; color: #333 !important; }
+  .course-block { border: 1px solid #999 !important; color: #111 !important; background: #eee !important; box-shadow: none !important; }
+}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+// ============================================================
+// ENGINE & DATA
+// ============================================================
+const DAYS = ['Pazartesi','Salı','Çarşamba','Perşembe','Cuma'];
+const DAY_SHORT = {Pazartesi:'Pzt',Salı:'Sal',Çarşamba:'Çar',Perşembe:'Per',Cuma:'Cum'};
+const TIME_SLOTS = ['08:30','09:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:30','19:30'];
+const SLOT_LABELS = ['08:30-09:20','09:30-10:20','10:30-11:20','11:30-12:20','12:30-13:20','13:30-14:20','14:30-15:20','15:30-16:20','16:30-17:20','17:30-18:20','18:30-19:20','19:30-20:20'];
+
+function timeToMinutes(t){ const [h,m] = t.split(':').map(Number); return h*60+m; }
+function getSlotIndex(t){ return TIME_SLOTS.indexOf(t); }
+function getSlotSpan(s,e){ return Math.ceil((timeToMinutes(e) - timeToMinutes(s))/60); }
+function doTimesOverlap(a,b){
+  if(a.day !== b.day) return false;
+  const s1 = timeToMinutes(a.start), e1 = timeToMinutes(a.end);
+  const s2 = timeToMinutes(b.start), e2 = timeToMinutes(b.end);
+  return !(e1 <= s2 || e2 <= s1);
+}
+function hasConflict(existing, newSlots){
+  for(const e of existing) {
+    for(const n of newSlots) {
+      if(doTimesOverlap(e, n)) return true;
+    }
+  }
+  return false;
+}
+
+function getSlotSignature(slots) {
+  return slots.map(s => `${s.day}:${s.start}-${s.end}`).sort().join('|');
+}
+
+function buildDecisionUnits(courses, instructorFilters = {}) {
+  const units = [];
+  for (const c of courses) {
+    const allowedInstructors = instructorFilters[c.code] || null;
+
+    if (c.type === 'common') {
+      const sectionMap = {};
+      for (const comp of c.components) {
+        for (const sec of comp.sections) {
+          if (allowedInstructors && !allowedInstructors.includes(sec.instructor)) continue;
+          if (!sectionMap[sec.section]) {
+            sectionMap[sec.section] = {
+              section: sec.section,
+              instructor: sec.instructor || '',
+              room: sec.room || '',
+              slots: []
+            };
+          }
+          sectionMap[sec.section].slots.push(...sec.slots.map(s => ({
+            ...s,
+            courseCode: c.code,
+            courseName: c.name,
+            component: comp.component,
+            sectionNum: sec.section,
+            instructor: sec.instructor || '',
+            room: sec.room || ''
+          })));
+        }
+      }
+
+      const signatureMap = {};
+      for (const sec of Object.values(sectionMap)) {
+        const sig = getSlotSignature(sec.slots);
+        if (!signatureMap[sig]) {
+          signatureMap[sig] = { section: sec.section, sections: [sec], slots: sec.slots };
+        } else {
+          signatureMap[sig].sections.push(sec);
+        }
+      }
+
+      const options = Object.values(signatureMap).map(grp => {
+        const altSections = grp.sections.map(s => ({ section: s.section, instructor: s.instructor, room: s.room }));
+        const enhancedSlots = grp.slots.map(sl => ({
+          ...sl,
+          hasAlternative: grp.sections.length > 1,
+          allSections: altSections,
+          primarySection: grp.section
+        }));
+        return { section: grp.section, hasAlternative: grp.sections.length > 1, allSections: altSections, slots: enhancedSlots };
+      });
+
+      if (options.length > 0) {
+        units.push({ id: c.code, courseCode: c.code, courseName: c.name, type: 'common', options });
+      }
+    } else {
+      for (const comp of c.components) {
+        const filteredSections = comp.sections.filter(sec =>
+          !allowedInstructors || allowedInstructors.includes(sec.instructor)
+        );
+
+        const signatureMap = {};
+        for (const sec of filteredSections) {
+          const sig = getSlotSignature(sec.slots);
+          if (!signatureMap[sig]) {
+            signatureMap[sig] = { section: sec.section, sections: [sec], slots: sec.slots };
+          } else {
+            signatureMap[sig].sections.push(sec);
+          }
+        }
+
+        const options = Object.values(signatureMap).map(grp => {
+          const altSections = grp.sections.map(s => ({ section: s.section, instructor: s.instructor, room: s.room }));
+          const enhancedSlots = grp.slots.map(s => ({
+            ...s,
+            courseCode: c.code,
+            courseName: c.name,
+            component: comp.component,
+            sectionNum: grp.section,
+            instructor: grp.sections[0].instructor || '',
+            room: grp.sections[0].room || '',
+            hasAlternative: grp.sections.length > 1,
+            allSections: altSections,
+            primarySection: grp.section
+          }));
+          return { section: grp.section, hasAlternative: grp.sections.length > 1, allSections: altSections, slots: enhancedSlots };
+        });
+
+        if (options.length > 0) {
+          units.push({
+            id: `${c.code}_${comp.component}`,
+            courseCode: c.code,
+            courseName: c.name,
+            type: 'departmental',
+            component: comp.component,
+            options
+          });
+        }
+      }
+    }
+  }
+  return units;
+}
+
+function generateSchedules(courses, freeDays = [], instructorFilters = {}, maxResults = 500) {
+  const units = buildDecisionUnits(courses, instructorFilters);
+  const totalExpectedUnits = courses.reduce((acc, c) => acc + (c.type === 'common' ? 1 : c.components.length), 0);
+  if (units.length < totalExpectedUnits) return [];
+
+  const results = [];
+  function bt(ui, currentSlots, currentSelections) {
+    if (results.length >= maxResults) return;
+    if (ui === units.length) {
+      results.push({
+        selections: [...currentSelections],
+        slots: [...currentSlots],
+        score: calcScore(currentSlots)
+      });
+      return;
+    }
+    const u = units[ui];
+    for (const opt of u.options) {
+      if (freeDays.length > 0 && opt.slots.some(s => freeDays.includes(s.day))) continue;
+      if (hasConflict(currentSlots, opt.slots)) continue;
+
+      currentSelections.push({
+        unitId: u.id,
+        courseCode: u.courseCode,
+        courseName: u.courseName,
+        component: u.component || 'all',
+        section: opt.section,
+        hasAlternative: opt.hasAlternative,
+        allSections: opt.allSections,
+        slots: opt.slots
+      });
+      currentSlots.push(...opt.slots);
+
+      bt(ui + 1, currentSlots, currentSelections);
+
+      currentSelections.pop();
+      currentSlots.splice(currentSlots.length - opt.slots.length, opt.slots.length);
+    }
+  }
+
+  bt(0, [], []);
+  results.sort((a, b) => a.score.totalGap - b.score.totalGap);
+  return results;
+}
+
+function calcScore(slots) {
+  const ds = {};
+  for (const s of slots) { if (!ds[s.day]) ds[s.day] = []; ds[s.day].push(s); }
+  let tg = 0, ad = 0, th = 0, mg = 0;
+  for (const d of DAYS) {
+    const sl = ds[d]; if (!sl || !sl.length) continue;
+    ad++;
+    const sorted = [...sl].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
+    for (const s of sorted) th += (timeToMinutes(s.end) - timeToMinutes(s.start)) / 60;
+    let dg = 0;
+    for (let i = 1; i < sorted.length; i++) {
+      const g = timeToMinutes(sorted[i].start) - timeToMinutes(sorted[i-1].end);
+      if (g > 0) dg += g;
+    }
+    tg += dg;
+    mg = Math.max(mg, dg);
+  }
+  return { totalGap: tg, activeDays: ad, totalHours: Math.round(th * 10) / 10, maxDailyGap: mg, avgGapPerDay: ad > 0 ? Math.round(tg / ad) : 0 };
+}
+
+function extractInstructorsByCourse(courses) {
+  const map = {};
+  for (const c of courses) {
+    const instSet = new Set();
+    const instSections = {};
+    for (const comp of c.components) {
+      for (const sec of comp.sections) {
+        if (sec.instructor) {
+          instSet.add(sec.instructor);
+          if (!instSections[sec.instructor]) instSections[sec.instructor] = [];
+          const label = `${comp.component === 'lab' ? 'Lab ' : ''}Ş.${sec.section}`;
+          if (!instSections[sec.instructor].includes(label)) instSections[sec.instructor].push(label);
+        }
+      }
+    }
+    map[c.code] = Array.from(instSet).map(name => ({ name, sections: instSections[name] || [] }));
+  }
+  return map;
+}
+
+const DEFAULT_DATA = { courses: [
+{ code:"BM101", name:"Bilgisayar Programlama", type:"departmental", components:[
+  { component:"theory", sections:[
+    { section:1, instructor:"Dr. Öğr. Üyesi Hüseyin Temuçin", room:"416", slots:[{day:"Perşembe",start:"13:30",end:"15:20"}] },
+    { section:2, instructor:"Dr. Öğr. Üyesi Hüseyin Temuçin", room:"416", slots:[{day:"Perşembe",start:"15:30",end:"17:20"}] }
+  ]},
+  { component:"lab", sections:[
+    { section:1, instructor:"Dr. Öğr. Üyesi S. T. Şahin Tekin", room:"400", slots:[{day:"Pazartesi",start:"10:30",end:"12:20"}] },
+    { section:2, instructor:"Dr. Öğr. Üyesi S. T. Şahin Tekin", room:"400", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"}] }
+  ]}
+]},
+{ code:"BM103", name:"Bilg. Müh. Temelleri", type:"departmental", components:[
+  { component:"theory", sections:[
+    { section:1, instructor:"Doç. Dr. Feyza Yıldırım Okay", room:"402", slots:[{day:"Çarşamba",start:"10:30",end:"13:20"}] }
+  ]}
+]},
+{ code:"MAT199", name:"Lineer Cebir", type:"common", components:[
+  { component:"theory", sections:[
+    { section:1, instructor:"Prof. Dr. Şerife Büyükköse", room:"418", slots:[{day:"Salı",start:"09:30",end:"12:20"}] },
+    { section:2, instructor:"Prof. Dr. Şerife Büyükköse", room:"418", slots:[{day:"Salı",start:"13:30",end:"16:20"}] }
+  ]}
+]},
+{ code:"FIZ103", name:"Fizik I", type:"common", components:[
+  { component:"theory", sections:[
+    { section:1, instructor:"Doç. Dr. Esra E. Tanrıkulu", room:"119", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"},{day:"Çarşamba",start:"08:30",end:"10:20"}] },
+    { section:2, instructor:"Doç. Dr. Hilal Küçük", room:"117", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"},{day:"Çarşamba",start:"08:30",end:"10:20"}] },
+    { section:3, instructor:"Doç. Dr. Esra E. Tanrıkulu", room:"119", slots:[{day:"Pazartesi",start:"15:30",end:"17:20"},{day:"Çarşamba",start:"10:30",end:"12:20"}] },
+    { section:4, instructor:"Doç. Dr. Hilal Küçük", room:"117", slots:[{day:"Pazartesi",start:"15:30",end:"17:20"},{day:"Çarşamba",start:"10:30",end:"12:20"}] },
+    { section:5, instructor:"Prof. Dr. Yunus Özen", room:"119", slots:[{day:"Salı",start:"08:30",end:"10:20"},{day:"Perşembe",start:"13:30",end:"15:20"}] },
+    { section:6, instructor:"Dr. Öğr. Üyesi Kıvanç Uyanık", room:"117", slots:[{day:"Salı",start:"08:30",end:"10:20"},{day:"Perşembe",start:"13:30",end:"15:20"}] },
+    { section:7, instructor:"Prof. Dr. Yunus Özen", room:"119", slots:[{day:"Salı",start:"10:30",end:"12:20"},{day:"Perşembe",start:"15:30",end:"17:20"}] },
+    { section:8, instructor:"Dr. Öğr. Üyesi Kıvanç Uyanık", room:"117", slots:[{day:"Salı",start:"10:30",end:"12:20"},{day:"Perşembe",start:"15:30",end:"17:20"}] },
+    { section:9, instructor:"Doç. Dr. Ali Emre Genç", room:"117", slots:[{day:"Çarşamba",start:"13:30",end:"15:20"},{day:"Cuma",start:"08:30",end:"10:20"}] },
+    { section:10, instructor:"Doç. Dr. Aycan Özkan", room:"119", slots:[{day:"Salı",start:"14:30",end:"15:20"},{day:"Perşembe",start:"08:30",end:"10:20"}] },
+    { section:11, instructor:"Doç. Dr. Ali Emre Genç", room:"117", slots:[{day:"Çarşamba",start:"15:30",end:"17:20"},{day:"Cuma",start:"10:30",end:"12:20"}] },
+    { section:12, instructor:"Doç. Dr. Aycan Özkan", room:"119", slots:[{day:"Salı",start:"15:30",end:"17:20"},{day:"Perşembe",start:"10:30",end:"12:20"}] },
+    { section:13, instructor:"Doç. Dr. Aycan Özkan", room:"224", slots:[{day:"Çarşamba",start:"08:30",end:"10:20"},{day:"Cuma",start:"13:30",end:"15:20"}] },
+    { section:14, instructor:"Doç. Dr. Aycan Özkan", room:"224", slots:[{day:"Çarşamba",start:"10:30",end:"12:20"},{day:"Cuma",start:"15:30",end:"17:20"}] },
+    { section:15, instructor:"Dr. Öğr. Üyesi Mahmut Bucurgat", room:"119", slots:[{day:"Çarşamba",start:"13:30",end:"15:20"},{day:"Cuma",start:"08:30",end:"10:20"}] },
+    { section:16, instructor:"Dr. Öğr. Üyesi Mahmut Bucurgat", room:"119", slots:[{day:"Çarşamba",start:"15:30",end:"17:20"},{day:"Cuma",start:"10:30",end:"12:20"}] }
+  ]}
+]},
+{ code:"MATH101", name:"Mathematics I", type:"common", components:[
+  { component:"theory", sections:[
+    { section:1, instructor:"Arş. Gör. Dr. R.S. Altınkaya", room:"122", slots:[{day:"Pazartesi",start:"10:30",end:"12:20"},{day:"Çarşamba",start:"10:30",end:"12:20"}] },
+    { section:2, instructor:"Doç. Dr. Anıl Altınkaya", room:"410", slots:[{day:"Pazartesi",start:"10:30",end:"12:20"},{day:"Çarşamba",start:"13:30",end:"15:20"}] },
+    { section:3, instructor:"Arş. Gör. Dr. R.S. Altınkaya", room:"122", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"},{day:"Çarşamba",start:"15:30",end:"17:20"}] },
+    { section:4, instructor:"Doç. Dr. Anıl Altınkaya", room:"410", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"},{day:"Çarşamba",start:"15:30",end:"17:20"}] },
+    { section:5, instructor:"Arş. Gör. Dr. R.S. Altınkaya", room:"122", slots:[{day:"Pazartesi",start:"15:30",end:"17:20"},{day:"Çarşamba",start:"13:30",end:"15:20"}] },
+    { section:6, instructor:"Dr. Öğr. Üyesi Ç.C. Özken", room:"122", slots:[{day:"Salı",start:"08:30",end:"10:20"},{day:"Perşembe",start:"13:30",end:"15:20"}] },
+    { section:7, instructor:"Dr. Öğr. Üyesi Sezin Çit", room:"410", slots:[{day:"Salı",start:"08:30",end:"10:20"},{day:"Perşembe",start:"13:30",end:"15:20"}] },
+    { section:8, instructor:"Dr. Öğr. Üyesi Ç.C. Özken", room:"122", slots:[{day:"Salı",start:"10:30",end:"12:20"},{day:"Perşembe",start:"10:30",end:"12:20"}] },
+    { section:9, instructor:"Dr. Öğr. Üyesi Sezin Çit", room:"410", slots:[{day:"Salı",start:"10:30",end:"12:20"},{day:"Perşembe",start:"15:30",end:"17:20"}] },
+    { section:10, instructor:"Dr. Öğr. Üyesi Ç.C. Özken", room:"122", slots:[{day:"Salı",start:"13:30",end:"15:20"},{day:"Perşembe",start:"08:30",end:"10:20"}] },
+    { section:11, instructor:"Doç. Mustafa Aslantaş", room:"410", slots:[{day:"Salı",start:"13:30",end:"15:20"},{day:"Perşembe",start:"08:30",end:"10:20"}] },
+    { section:12, instructor:"Arş. Gör. Dr. B.Z. Sergi Yılmaz", room:"115", slots:[{day:"Salı",start:"13:30",end:"15:20"},{day:"Cuma",start:"13:30",end:"15:20"}] },
+    { section:13, instructor:"Doç. Mustafa Aslantaş", room:"410", slots:[{day:"Salı",start:"15:30",end:"17:20"},{day:"Perşembe",start:"10:30",end:"12:20"}] },
+    { section:14, instructor:"Dr. Öğr. Üyesi Emre Sevgi", room:"410", slots:[{day:"Çarşamba",start:"10:30",end:"12:20"},{day:"Cuma",start:"13:30",end:"15:20"}] },
+    { section:15, instructor:"Dr. Öğr. Üyesi Emre Sevgi", room:"209", slots:[{day:"Çarşamba",start:"13:30",end:"15:20"},{day:"Cuma",start:"10:30",end:"12:20"}] }
+  ]}
+]},
+{ code:"ENG103", name:"English I", type:"common", components:[
+  { component:"theory", sections:[
+    { section:1, instructor:"Öğr. Gör. Aslı Islıkaye", room:"117", slots:[{day:"Pazartesi",start:"09:30",end:"12:20"}] },
+    { section:2, instructor:"Öğr. Gör. M. Değirmenci", room:"210", slots:[{day:"Pazartesi",start:"09:30",end:"12:20"}] },
+    { section:3, instructor:"Öğr. Gör. Aslı Islıkaye", room:"211", slots:[{day:"Pazartesi",start:"13:30",end:"16:20"}] },
+    { section:4, instructor:"Öğr. Gör. M. Değirmenci", room:"210", slots:[{day:"Pazartesi",start:"13:30",end:"16:20"}] },
+    { section:5, instructor:"Öğr. Gör. Aslı Islıkaye", room:"224", slots:[{day:"Salı",start:"09:30",end:"12:20"}] },
+    { section:6, instructor:"Öğr. Gör. M. Değirmenci", room:"210", slots:[{day:"Salı",start:"09:30",end:"12:20"}] },
+    { section:7, instructor:"Öğr. Gör. Aslı Islıkaye", room:"224", slots:[{day:"Salı",start:"13:30",end:"15:20"}] },
+    { section:8, instructor:"Öğr. Gör. M. Değirmenci", room:"210", slots:[{day:"Salı",start:"13:30",end:"15:20"}] },
+    { section:9, instructor:"Öğr. Gör. Aslı Islıkaye", room:"224", slots:[{day:"Çarşamba",start:"13:30",end:"16:20"}] },
+    { section:10, instructor:"Öğr. Gör. M. Değirmenci", room:"210", slots:[{day:"Çarşamba",start:"13:30",end:"16:20"}] },
+    { section:11, instructor:"Öğr. Gör. Aslı Islıkaye", room:"224", slots:[{day:"Perşembe",start:"09:30",end:"12:20"}] },
+    { section:12, instructor:"Öğr. Gör. Aslı Islıkaye", room:"224", slots:[{day:"Perşembe",start:"13:30",end:"16:20"}] },
+    { section:13, instructor:"Öğr. Gör. M. Değirmenci", room:"115", slots:[{day:"Cuma",start:"09:30",end:"12:20"}] },
+    { section:14, instructor:"Öğr. Gör. M. Değirmenci", room:"115", slots:[{day:"Cuma",start:"13:30",end:"16:20"}] }
+  ]}
+]},
+{ code:"TAR101", name:"Atatürk İlk. ve İnk. Tarihi I", type:"common", components:[
+  { component:"theory", sections:[
+    { section:3, instructor:"Dr. Serpil Asar", room:"UZAKTAN", slots:[{day:"Çarşamba",start:"17:30",end:"19:20"}] },
+    { section:4, instructor:"Dr. Serpil Asar", room:"UZAKTAN", slots:[{day:"Çarşamba",start:"19:30",end:"21:20"}] },
+    { section:5, instructor:"Dr. Serpil Asar", room:"UZAKTAN", slots:[{day:"Perşembe",start:"17:30",end:"19:20"}] },
+    { section:6, instructor:"Öğr. Gör. M. Akif Bal", room:"UZAKTAN", slots:[{day:"Perşembe",start:"17:30",end:"19:20"}] },
+    { section:7, instructor:"Öğr. Gör. M. Akif Bal", room:"UZAKTAN", slots:[{day:"Perşembe",start:"19:30",end:"21:20"}] },
+    { section:8, instructor:"Öğr. Gör. M. Akif Bal", room:"UZAKTAN", slots:[{day:"Cuma",start:"17:30",end:"19:20"}] }
+  ]}
+]}
+]};
+
+// ============================================================
+// REACT COMPONENTS & RUNTIME
+// ============================================================
+const { useState, useEffect, useCallback, useMemo, useRef } = React;
+const h = React.createElement;
+
+// 1. Theme Toggle
+const ThemeToggle = React.memo(function ThemeToggle({ theme, onToggle }) {
+  return h('button', {
+    type: 'button',
+    className: 'theme-toggle-btn',
+    title: theme === 'dark' ? 'Açık Temaya Geç' : 'Koyu Temaya Geç',
+    onClick: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onToggle();
+    }
+  },
+    h('span', { className: 'theme-toggle-icon' }, theme === 'dark' ? '☀️' : '🌙'),
+    h('span', null, theme === 'dark' ? 'Açık Tema' : 'Koyu Tema')
+  );
+});
+
+// 2. Toast Notification
+const ToastNotification = React.memo(function ToastNotification({ toast, onDismiss }) {
+  if (!toast) return null;
+  return h('div', { className: 'toast-container' },
+    h('div', { className: `toast toast--${toast.type || 'warning'}${toast.exiting ? ' toast--exiting' : ''}` },
+      h('span', { className: 'toast__icon' }, toast.icon || '🚧'),
+      h('span', { className: 'toast__text' }, toast.message),
+      h('button', {
+        type: 'button',
+        className: 'toast__close',
+        onClick: (e) => { e.preventDefault(); e.stopPropagation(); onDismiss(); }
+      }, '×')
+    )
+  );
+});
+
+// 3. Enhanced Header with Logo, Semester, Countdown
+const HeaderEnhanced = React.memo(function HeaderEnhanced({ theme, onToggleTheme, onShowDevToast }) {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const dateStr = useMemo(() => {
+    const d = now;
+    return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
+  }, [now]);
+
+  const countdown = useMemo(() => {
+    const target = new Date(2026, 8, 10, 9, 0, 0); // 10.09.2026 09:00:00
+    const diff = target - now;
+    if (diff <= 0) return null;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    return { days, hours, minutes, seconds };
+  }, [now]);
+
+  return h('header', { className: 'header-enhanced' },
+    // Top Bar (3 blocks: Sol, Merkez, Sağ)
+    h('div', { className: 'header-top-bar' },
+      // 1. SOL ALAN (Left): 1. Yarıyıl + Mock Dropdown
+      h('div', { className: 'header-left' },
+        h('span', { className: 'header-semester-badge' }, '📅 1. Yarıyıl (1. Sınıf 1. Dönem)'),
+        h('div', { className: 'header-dev-dropdown' },
+          h('button', {
+            type: 'button',
+            className: 'btn-dev-dropdown',
+            onClick: (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onShowDevToast();
+            }
+          }, 'Diğer Bölümler ▾')
+        )
+      ),
+      // 2. MERKEZ ALAN (Center): GAZİ ÜNİVERSİTESİ (Sabit Ortalanmış)
+      h('div', { className: 'header-center' },
+        h('div', { className: 'header-brand' },
+          h('div', { className: 'header-logo-icon' }, '🎓'),
+          h('span', { className: 'header-brand-name' }, 'GAZİ ÜNİVERSİTESİ'),
+          h('span', { className: 'header-brand-badge' }, 'BM')
+        )
+      ),
+      // 3. SAĞ ALAN (Right): Geri sayım sayacı + Tarih + Tema Değiştirme (flex-row, items-center, gap-4)
+      h('div', { className: 'header-right' },
+        // Geri sayım sayacı
+        h('div', { className: 'header-countdown-wrapper', title: 'Ders Seçimine Kalan Süre' },
+          h('span', { className: 'header-countdown-label' }, '⏱️ Kalan:'),
+          countdown ? h('div', { className: 'header-countdown' },
+            h('div', { className: 'countdown-unit' },
+              h('span', { className: 'countdown-value' }, String(countdown.days).padStart(2, '0')),
+              h('span', { className: 'countdown-label-sub' }, 'g')
+            ),
+            h('span', { className: 'countdown-separator' }, ':'),
+            h('div', { className: 'countdown-unit' },
+              h('span', { className: 'countdown-value' }, String(countdown.hours).padStart(2, '0')),
+              h('span', { className: 'countdown-label-sub' }, 's')
+            ),
+            h('span', { className: 'countdown-separator' }, ':'),
+            h('div', { className: 'countdown-unit' },
+              h('span', { className: 'countdown-value' }, String(countdown.minutes).padStart(2, '0')),
+              h('span', { className: 'countdown-label-sub' }, 'dk')
+            ),
+            h('span', { className: 'countdown-separator' }, ':'),
+            h('div', { className: 'countdown-unit' },
+              h('span', { className: 'countdown-value' }, String(countdown.seconds).padStart(2, '0')),
+              h('span', { className: 'countdown-label-sub' }, 'sn')
+            )
+          ) : h('span', { className: 'countdown-expired' }, '⏰ Süre Doldu!')
+        ),
+        // Tarih
+        h('div', { className: 'header-date-badge' },
+          h('span', null, '📆'),
+          h('span', null, dateStr)
+        ),
+        // Tema Değiştirme (Dark / Light)
+        h(ThemeToggle, { theme, onToggle: onToggleTheme })
+      )
+    ),
+    // Hero Title & Subtitle
+    h('div', { className: 'header-hero' },
+      h('h1', { className: 'header__title' }, 'Ders Programı Optimizasyonu'),
+      h('p', { className: 'header__subtitle' },
+        'Sıfır çakışmalı, şube saatleri tekilleştirilmiş ve dinamik hoca filtrelemeli akıllı ders programı oluşturucu'
+      )
+    )
+  );
+});
+
+// 4. Smart Filters Panel (Öğle Molası, Uykucu, Tarihi Yolda)
+const SmartFiltersPanel = React.memo(function SmartFiltersPanel({
+  lunchBreak, onLunchBreakToggle,
+  sleepy, onSleepyToggle,
+  historyNoGap, onHistoryNoGapToggle,
+  hasTAR101
+}) {
+  return h('div', { className: 'panel' },
+    h('div', { className: 'panel__header' },
+      h('div', { className: 'panel__icon' }, '🧠'),
+      h('h2', { className: 'panel__title' }, 'Akıllı Filtreler'),
+      h('span', { className: 'panel__badge' },
+        `${[lunchBreak, sleepy, historyNoGap].filter(Boolean).length} Aktif`
+      )
+    ),
+    h('div', { className: 'panel__body' },
+      h('div', { className: 'smart-filters-list' },
+        // Lunch Break
+        h('div', { className: `smart-filter-item${lunchBreak ? ' smart-filter-item--active' : ''}` },
+          h('span', { className: 'smart-filter-item__icon' }, '🍽️'),
+          h('div', { className: 'smart-filter-item__info' },
+            h('div', { className: 'smart-filter-item__name' }, 'Öğle Molası Bırak'),
+            h('div', { className: 'smart-filter-item__desc' }, '12:30 - 13:20 arası (en fazla 1 gün toleranslı)')
+          ),
+          h('label', { className: 'toggle-switch', onClick: (e) => e.stopPropagation() },
+            h('input', {
+              type: 'checkbox',
+              checked: lunchBreak,
+              onChange: (e) => { e.stopPropagation(); onLunchBreakToggle(); }
+            }),
+            h('span', { className: 'toggle-switch__slider' })
+          )
+        ),
+        // Sleepy
+        h('div', { className: `smart-filter-item${sleepy ? ' smart-filter-item--active' : ''}` },
+          h('span', { className: 'smart-filter-item__icon' }, '😴'),
+          h('div', { className: 'smart-filter-item__info' },
+            h('div', { className: 'smart-filter-item__name' },
+              'Uykucu Musun?',
+              h('span', {
+                className: 'smart-filter-item__tag',
+                title: "8.30'da gelmene gerek yok :)"
+              }, "8.30'da gelmene gerek yok :)")
+            ),
+            h('div', { className: 'smart-filter-item__desc' }, 'En fazla 1 gün 10:00 öncesi ders içeren esnek programlar')
+          ),
+          h('label', { className: 'toggle-switch', onClick: (e) => e.stopPropagation() },
+            h('input', {
+              type: 'checkbox',
+              checked: sleepy,
+              onChange: (e) => { e.stopPropagation(); onSleepyToggle(); }
+            }),
+            h('span', { className: 'toggle-switch__slider' })
+          )
+        ),
+        // History No Gap (TAR101)
+        hasTAR101 ? h('div', { className: `smart-filter-item${historyNoGap ? ' smart-filter-item--active' : ''}` },
+          h('span', { className: 'smart-filter-item__icon' }, '🎧'),
+          h('div', { className: 'smart-filter-item__info' },
+            h('div', { className: 'smart-filter-item__name' }, 'Tarihi Yolda Dinlerim'),
+            h('div', { className: 'smart-filter-item__desc' }, 'TAR101 ile diğer dersler arasında sıfır boşluk')
+          ),
+          h('label', { className: 'toggle-switch', onClick: (e) => e.stopPropagation() },
+            h('input', {
+              type: 'checkbox',
+              checked: historyNoGap,
+              onChange: (e) => { e.stopPropagation(); onHistoryNoGapToggle(); }
+            }),
+            h('span', { className: 'toggle-switch__slider' })
+          )
+        ) : null
+      )
+    )
+  );
+});
+
+// 5. Bookmark Button
+const BookmarkButton = React.memo(function BookmarkButton({ isSaved, onToggle }) {
+  return h('button', {
+    type: 'button',
+    className: `btn-bookmark${isSaved ? ' btn-bookmark--saved' : ''}`,
+    onClick: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onToggle();
+    },
+    title: isSaved ? 'Favorilerden Kaldır' : 'Favorilere Kaydet'
+  }, isSaved ? '★ Kaydedildi' : '☆ Kaydet');
+});
+
+// 6. Saved Schedules Panel (Alternatiflerim)
+const SavedSchedulesPanel = React.memo(function SavedSchedulesPanel({ savedSchedules, onLoadSchedule, onRemove }) {
+  const [isOpen, setIsOpen] = useState(true);
+
+  if (!savedSchedules || savedSchedules.length === 0) return null;
+
+  return h('div', { className: 'saved-panel' },
+    h('div', { className: 'panel' },
+      h('div', { className: 'panel__header', onClick: (e) => { e.preventDefault(); setIsOpen(p => !p); }, style: { cursor: 'pointer' } },
+        h('div', { className: 'panel__icon' }, '⭐'),
+        h('h2', { className: 'panel__title' }, 'Alternatiflerim'),
+        h('span', { className: 'panel__badge' }, `${savedSchedules.length} Kayıtlı`),
+        h('span', {
+          className: `saved-panel__toggle-icon${isOpen ? ' saved-panel__toggle-icon--open' : ''}`,
+          style: { marginLeft: 'auto' }
+        }, '▼')
+      ),
+      isOpen ? h('div', { className: 'panel__body' },
+        h('div', { className: 'saved-grid' },
+          savedSchedules.map((saved, idx) =>
+            h('div', {
+              key: idx,
+              className: 'saved-card',
+              onClick: (e) => { e.preventDefault(); e.stopPropagation(); onLoadSchedule(saved); }
+            },
+              h('div', { className: 'saved-card__title' }, `Program #${saved.originalIndex + 1}`),
+              h('div', { className: 'saved-card__stats' },
+                h('span', null, `📅 ${saved.score.activeDays} Gün`),
+                h('span', null, `⏱️ ${saved.score.totalGap} dk boşluk`),
+                h('span', null, `📚 ${saved.score.totalHours} sa`)
+              ),
+              h('button', {
+                type: 'button',
+                className: 'saved-card__remove',
+                onClick: (e) => { e.preventDefault(); e.stopPropagation(); onRemove(idx); },
+                title: 'Favorilerden Kaldır'
+              }, '✕')
+            )
+          )
+        )
+      ) : null
+    )
+  );
+});
+
+// 7. Footer Signature
+const FooterSignature = React.memo(function FooterSignature() {
+  return h('footer', { className: 'footer-signature' },
+    h('div', { className: 'footer-signature__text' },
+      'Tasarlayan ',
+      h('span', { className: 'footer-signature__name' }, 'Selim Hadi')
+    ),
+    h('span', { className: 'footer-signature__year' }, `© ${new Date().getFullYear()} — Gazi Üniversitesi`)
+  );
+});
+
+// Global Reset Button
+const GlobalResetButton = React.memo(function GlobalResetButton({ onReset }) {
+  return h('div', { className: 'global-reset-wrapper' },
+    h('button', {
+      type: 'button',
+      className: 'btn-global-reset',
+      onClick: (e) => { e.preventDefault(); e.stopPropagation(); onReset(); },
+      title: 'Tüm filtreleri ve kısıtları varsayılan durumuna sıfırla'
+    },
+      h('div', { className: 'btn-global-reset__left' },
+        h('span', { className: 'btn-global-reset__icon' }, '🔄'),
+        h('span', null, 'Tüm Filtreleri Sıfırla')
+      ),
+      h('span', { className: 'btn-global-reset__badge' }, 'Varsayılan')
+    )
+  );
+});
+
+// 3. Course List (Sidebar)
+const CourseInput = React.memo(function CourseInput({ courseData }) {
+  return h('div', { className: 'panel' },
+    h('div', { className: 'panel__header' },
+      h('div', { className: 'panel__icon' }, '📚'),
+      h('h2', { className: 'panel__title' }, 'Ders Listesi'),
+      h('span', { className: 'panel__badge' }, `${courseData ? courseData.courses.length : 0} Ders`)
+    ),
+    h('div', { className: 'panel__body' },
+      h('div', { className: 'course-tags fade-in' },
+        courseData && courseData.courses.map(c =>
+          h('span', { key: c.code, className: 'course-tag course-tag--loaded' }, `✓ ${c.code}`)
+        )
+      )
+    )
+  );
+});
+
+// 4. Day Constraints (Sidebar)
+const ConstraintPanel = React.memo(function ConstraintPanel({ freeDays, onDayToggle, onFridayToggle }) {
+  return h('div', { className: 'panel' },
+    h('div', { className: 'panel__header' },
+      h('div', { className: 'panel__icon' }, '⚙️'),
+      h('h2', { className: 'panel__title' }, 'Gün Kısıtları'),
+      h('span', { className: 'panel__badge' }, `${freeDays.length} Seçili`)
+    ),
+    h('div', { className: 'panel__body' },
+      h('div', { className: 'constraint-group__label' },
+        h('span', null, 'Boş Bırakılacak Günler')
+      ),
+      h('div', { className: 'day-checkboxes' },
+        DAYS.map(day => {
+          const isChecked = freeDays.includes(day);
+          return h('div', { key: day, className: 'day-cb' },
+            h('input', {
+              type: 'checkbox',
+              id: `cb-day-${day}`,
+              checked: isChecked,
+              onChange: (e) => {
+                e.stopPropagation();
+                onDayToggle(day);
+              }
+            }),
+            h('label', { htmlFor: `cb-day-${day}` }, DAY_SHORT[day])
+          );
+        })
+      ),
+      h('div', { className: 'friday-toggle' },
+        h('span', { className: 'friday-toggle__label' }, '🎯 Cuma gününü tamamen boş bırak'),
+        h('label', { className: 'toggle-switch' },
+          h('input', {
+            type: 'checkbox',
+            checked: freeDays.includes('Cuma'),
+            onChange: (e) => {
+              e.stopPropagation();
+              onFridayToggle();
+            }
+          }),
+          h('span', { className: 'toggle-switch__slider' })
+        )
+      )
+    )
+  );
+});
+
+// 5. Instructor Filters Panel (Sidebar, Preserves Scroll Position)
+const InstructorFiltersPanel = React.memo(function InstructorFiltersPanel({
+  instructorsByCourse,
+  instructorFilters,
+  onInstructorToggle,
+  onSelectAll,
+  onClearAll
+}) {
+  return h('div', { className: 'panel' },
+    h('div', { className: 'panel__header' },
+      h('div', { className: 'panel__icon' }, '👨‍🏫'),
+      h('h2', { className: 'panel__title' }, 'Öğretim Üyesi Filtresi'),
+      h('span', { className: 'panel__badge' }, 'Anlık Tepki')
+    ),
+    h('div', { className: 'panel__body' },
+      h('div', { className: 'instructor-filters-wrapper' },
+        Object.entries(instructorsByCourse).map(([courseCode, instList]) => {
+          if (!instList || instList.length <= 1) return null;
+          const allowed = instructorFilters[courseCode] || [];
+          const isAllChecked = instList.every(i => allowed.includes(i.name));
+
+          return h('div', { key: courseCode, className: 'course-filter-card' },
+            h('div', { className: 'course-filter-card__header' },
+              h('div', { className: 'course-filter-card__title' },
+                courseCode,
+                h('span', { className: 'course-filter-card__sub' }, `(${allowed.length}/${instList.length})`)
+              ),
+              h('div', { className: 'course-filter-card__actions' },
+                h('button', {
+                  type: 'button',
+                  className: 'btn-text-action',
+                  onClick: (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (isAllChecked) onClearAll(courseCode);
+                    else onSelectAll(courseCode);
+                  }
+                }, isAllChecked ? 'Temizle' : 'Tümü')
+              )
+            ),
+            h('div', { className: 'instructor-list' },
+              instList.map(inst => {
+                const isChecked = allowed.includes(inst.name);
+                return h('label', {
+                  key: inst.name,
+                  className: 'instructor-item',
+                  onClick: (e) => e.stopPropagation()
+                },
+                  h('input', {
+                    type: 'checkbox',
+                    checked: isChecked,
+                    onChange: (e) => {
+                      e.stopPropagation();
+                      onInstructorToggle(courseCode, inst.name);
+                    }
+                  }),
+                  h('span', { className: 'instructor-item__name', title: inst.name }, inst.name),
+                  h('span', { className: 'instructor-item__sections' }, inst.sections.join(', '))
+                );
+              })
+            )
+          );
+        })
+      )
+    )
+  );
+});
+
+// 6. Stats Grid
+const StatsGrid = React.memo(function StatsGrid({ total, score }) {
+  return h('div', { className: 'stats-grid' },
+    h('div', { className: 'stat-card' },
+      h('div', { className: 'stat-card__value' }, String(total)),
+      h('div', { className: 'stat-card__label' }, 'Tekil Alternatif')
+    ),
+    h('div', { className: 'stat-card' },
+      h('div', { className: 'stat-card__value' }, String(score.activeDays)),
+      h('div', { className: 'stat-card__label' }, 'Aktif Gün')
+    ),
+    h('div', { className: 'stat-card' },
+      h('div', { className: 'stat-card__value' }, `${score.totalGap} dk`),
+      h('div', { className: 'stat-card__label' }, 'Toplam Gün İçi Boşluk')
+    ),
+    h('div', { className: 'stat-card' },
+      h('div', { className: 'stat-card__value' }, `${score.totalHours} sa`),
+      h('div', { className: 'stat-card__label' }, 'Ders Yükü')
+    )
+  );
+});
+
+// 7. Advanced Pagination (<<, <, [X] / Y, >, >>) with Strict Boundary Checks
+const AdvancedPagination = React.memo(function AdvancedPagination({
+  currentIndex,
+  total,
+  onIndexChange
+}) {
+  const isFirstDisabled = currentIndex <= 0;
+  const isLastDisabled = currentIndex >= total - 1;
+
+  const handleFirst = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (currentIndex > 0) onIndexChange(0);
+  }, [currentIndex, onIndexChange]);
+
+  const handlePrev = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (currentIndex > 0) onIndexChange(Math.max(0, currentIndex - 1));
+  }, [currentIndex, onIndexChange]);
+
+  const handleNext = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (currentIndex < total - 1) onIndexChange(Math.min(total - 1, currentIndex + 1));
+  }, [currentIndex, total, onIndexChange]);
+
+  const handleLast = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (currentIndex < total - 1) onIndexChange(total - 1);
+  }, [currentIndex, total, onIndexChange]);
+
+  const handleInputChange = useCallback((e) => {
+    const val = parseInt(e.target.value, 10);
+    if (!isNaN(val)) {
+      const clamped = Math.max(0, Math.min(total - 1, val - 1));
+      onIndexChange(clamped);
+    }
+  }, [total, onIndexChange]);
+
+  return h('div', { className: 'pagination-bar' },
+    h('div', { className: 'pagination-controls' },
+      h('button', {
+        type: 'button',
+        className: 'btn-nav-page',
+        disabled: isFirstDisabled,
+        onClick: handleFirst,
+        title: 'En Başa Git (İlk Program)'
+      }, '<<'),
+      h('button', {
+        type: 'button',
+        className: 'btn-nav-page',
+        disabled: isFirstDisabled,
+        onClick: handlePrev,
+        title: 'Önceki Program (Sol Ok)'
+      }, '◀')
+    ),
+    h('div', { className: 'page-jump-wrapper' },
+      h('span', null, 'Program'),
+      h('input', {
+        type: 'number',
+        className: 'page-input',
+        min: 1,
+        max: total,
+        value: total > 0 ? currentIndex + 1 : 0,
+        onChange: handleInputChange,
+        onKeyDown: (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handleInputChange(e);
+          }
+        },
+        title: 'İstediğiniz program numarasını yazıp Enter\'a basın'
+      }),
+      h('span', { className: 'page-total' }, `/ ${total}`)
+    ),
+    h('div', { className: 'pagination-controls' },
+      h('button', {
+        type: 'button',
+        className: 'btn-nav-page',
+        disabled: isLastDisabled,
+        onClick: handleNext,
+        title: 'Sonraki Program (Sağ Ok)'
+      }, '▶'),
+      h('button', {
+        type: 'button',
+        className: 'btn-nav-page',
+        disabled: isLastDisabled,
+        onClick: handleLast,
+        title: 'En Sona Git (Son Program)'
+      }, '>>')
+    )
+  );
+});
+
+// 8. Schedule Table Component
+const ScheduleTable = React.memo(function ScheduleTable({ schedule, allCourseCodes, onBlockClick }) {
+  const { blocks, occCells, activeDays, minS, maxS } = useMemo(() => {
+    const slots = schedule.slots;
+    const bList = [];
+    const occ = {};
+
+    for (const slot of slots) {
+      const si = getSlotIndex(slot.start);
+      const span = getSlotSpan(slot.start, slot.end);
+      if (si === -1) continue;
+      bList.push({
+        ...slot,
+        startIdx: si,
+        span,
+        colorIdx: allCourseCodes.indexOf(slot.courseCode) % 7
+      });
+      for (let i = 0; i < span; i++) occ[`${slot.day}-${si + i}`] = true;
+    }
+
+    const aDays = DAYS.filter(d => slots.some(s => s.day === d));
+    let mi = 11, ma = 0;
+    bList.forEach(b => {
+      mi = Math.min(mi, b.startIdx);
+      ma = Math.max(ma, b.startIdx + b.span - 1);
+    });
+    if (mi > ma) { mi = 0; ma = 8; }
+    return { blocks: bList, occCells: occ, activeDays: aDays, minS: mi, maxS: ma };
+  }, [schedule, allCourseCodes]);
+
+  return h('div', { className: 'schedule-container', id: 'schedule-capture-area' },
+    h('table', { className: 'schedule-table' },
+      h('thead', null,
+        h('tr', null,
+          h('th', null, 'Saat'),
+          activeDays.map(d => h('th', { key: d }, d))
+        )
+      ),
+      h('tbody', null,
+        Array.from({ length: maxS - minS + 1 }, (_, i) => minS + i).map(si =>
+          h('tr', { key: si },
+            h('td', null, SLOT_LABELS[si]),
+            activeDays.map(day => {
+              const block = blocks.find(b => b.day === day && b.startIdx === si);
+              if (block) {
+                return h('td', { key: day, rowSpan: block.span },
+                  h('div', {
+                    className: `course-block course-block--${block.colorIdx}`,
+                    onClick: (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      onBlockClick(block, rect);
+                    }
+                  },
+                    h('div', { className: 'course-block__code' },
+                      h('span', null, block.courseCode),
+                      block.room ? h('span', { style: { fontSize: '0.62rem', opacity: 0.8 } }, block.room) : null
+                    ),
+                    h('div', { className: 'course-block__section' },
+                      `${block.component === 'lab' ? 'Lab' : 'Teori'} · Ş.${block.sectionNum}`
+                    ),
+                    block.instructor ? h('div', { className: 'course-block__instructor', title: block.instructor },
+                      `👨‍🏫 ${block.instructor}`
+                    ) : null,
+                    block.hasAlternative && block.allSections && block.allSections.length > 1 ? (
+                      h('div', { className: 'course-block__alt-badge' }, '⚡ Alternatif Şubeler')
+                    ) : null,
+                    h('div', { className: 'course-block__time' }, `${block.start}–${block.end}`)
+                  )
+                );
+              } else if (!occCells[`${day}-${si}`]) {
+                return h('td', { key: day });
+              }
+              return null;
+            })
+          )
+        )
+      )
+    )
+  );
+});
+
+// 9. Export Dropdown Component
+const ExportDropdown = React.memo(function ExportDropdown({ isOpen, onToggle, onExport }) {
+  return h('div', { className: 'export-dropdown-wrapper' },
+    h('button', {
+      type: 'button',
+      className: 'btn-export-main',
+      onClick: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onToggle();
+      }
+    },
+      '📥 Dışa Aktar',
+      h('span', { style: { fontSize: '0.65rem', marginLeft: '2px' } }, '▼')
+    ),
+    h('div', {
+      className: `export-menu ${isOpen ? 'show' : ''}`,
+      onClick: (e) => e.stopPropagation()
+    },
+      h('button', {
+        type: 'button',
+        className: 'export-item',
+        onClick: (e) => { e.preventDefault(); onExport('pdf'); }
+      },
+        h('span', { className: 'export-item__icon' }, '📄'),
+        h('div', null,
+          h('div', null, 'PDF İndir'),
+          h('div', { className: 'export-item__desc' }, 'A4 Yazdırılabilir')
+        )
+      ),
+      h('button', {
+        type: 'button',
+        className: 'export-item',
+        onClick: (e) => { e.preventDefault(); onExport('excel'); }
+      },
+        h('span', { className: 'export-item__icon' }, '📊'),
+        h('div', null,
+          h('div', null, 'Excel (.xlsx) İndir'),
+          h('div', { className: 'export-item__desc' }, 'Tablo & Detay')
+        )
+      ),
+      h('button', {
+        type: 'button',
+        className: 'export-item',
+        onClick: (e) => { e.preventDefault(); onExport('png'); }
+      },
+        h('span', { className: 'export-item__icon' }, '🖼️'),
+        h('div', null,
+          h('div', null, 'PNG Resmi İndir'),
+          h('div', { className: 'export-item__desc' }, 'Yüksek Kalite')
+        )
+      ),
+      h('button', {
+        type: 'button',
+        className: 'export-item',
+        onClick: (e) => { e.preventDefault(); onExport('jpeg'); }
+      },
+        h('span', { className: 'export-item__icon' }, '🌄'),
+        h('div', null,
+          h('div', null, 'JPEG Resmi İndir'),
+          h('div', { className: 'export-item__desc' }, 'Sıkıştırılmış')
+        )
+      ),
+      h('button', {
+        type: 'button',
+        className: 'export-item',
+        onClick: (e) => { e.preventDefault(); onExport('json'); }
+      },
+        h('span', { className: 'export-item__icon' }, '📋'),
+        h('div', null,
+          h('div', null, 'JSON Verisi İndir'),
+          h('div', { className: 'export-item__desc' }, 'Ham Veri')
+        )
+      )
+    )
+  );
+});
+
+// 10. Popover Card Component
+const PopoverCard = React.memo(function PopoverCard({ popoverData, onClose }) {
+  if (!popoverData) return null;
+  const { block, x, y } = popoverData;
+
+  return h('div', {
+    className: 'popover-card',
+    style: { left: `${Math.max(16, x)}px`, top: `${Math.max(16, y)}px` },
+    onClick: (e) => e.stopPropagation()
+  },
+    h('div', { className: 'popover-card__header' },
+      h('div', null,
+        h('div', { className: 'popover-card__code' }, `${block.courseCode} (${block.component === 'lab' ? 'Laboratuvar' : 'Teori'})`),
+        h('div', { className: 'popover-card__name' }, block.courseName)
+      ),
+      h('button', {
+        type: 'button',
+        className: 'popover-card__close',
+        onClick: (e) => {
+          e.preventDefault();
+          onClose();
+        }
+      }, '×')
+    ),
+    h('div', { className: 'popover-card__row' },
+      h('span', { className: 'popover-card__icon' }, '👨‍🏫'),
+      h('span', { className: 'popover-card__label' }, 'Öğretim Üyesi'),
+      h('span', { className: 'popover-card__val' }, block.instructor || 'Belirtilmedi')
+    ),
+    h('div', { className: 'popover-card__row' },
+      h('span', { className: 'popover-card__icon' }, '🏷️'),
+      h('span', { className: 'popover-card__label' }, 'Şube No'),
+      h('span', { className: 'popover-card__val' }, `Şube ${block.sectionNum}`)
+    ),
+    h('div', { className: 'popover-card__row' },
+      h('span', { className: 'popover-card__icon' }, '📍'),
+      h('span', { className: 'popover-card__label' }, 'Derslik / Oda'),
+      h('span', { className: 'popover-card__val' }, block.room || 'Belirtilmedi')
+    ),
+    h('div', { className: 'popover-card__row' },
+      h('span', { className: 'popover-card__icon' }, '⏰'),
+      h('span', { className: 'popover-card__label' }, 'Saat Dilimi'),
+      h('span', { className: 'popover-card__val' }, `${block.day} ${block.start} – ${block.end}`)
+    ),
+    block.hasAlternative && block.allSections && block.allSections.length > 1 ? (
+      h('div', { className: 'popover-card__alt-box' },
+        h('div', { className: 'popover-card__alt-title' }, '⚡ Aynı saatte alternatif şubeler mevcut:'),
+        block.allSections.map((s, idx) =>
+          h('div', { key: idx, className: 'popover-card__alt-item' },
+            `Şube ${s.section}: ${s.instructor || 'Öğretim Üyesi'} ${s.room ? `(${s.room})` : ''}`
+          )
+        )
+      )
+    ) : null
+  );
+});
+
+// ============================================================
+// MAIN APPLICATION COMPONENT
+// ============================================================
+function App() {
+  // Theme state with localStorage persistence
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('ders_programi_theme') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'light') {
+      document.body.classList.add('light');
+      document.body.classList.remove('dark');
+    } else {
+      document.body.classList.add('dark');
+      document.body.classList.remove('light');
+    }
+    localStorage.setItem('ders_programi_theme', theme);
+  }, [theme]);
+
+  const handleToggleTheme = useCallback(() => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  }, []);
+
+  // Course & Schedule State
+  const [courseData, setCourseData] = useState(() => DEFAULT_DATA);
+  const [freeDays, setFreeDays] = useState(['Cuma']);
+  const [instructorFilters, setInstructorFilters] = useState(() => {
+    const map = extractInstructorsByCourse(DEFAULT_DATA.courses);
+    const filters = {};
+    for (const [code, insts] of Object.entries(map)) {
+      filters[code] = insts.map(i => i.name);
+    }
+    return filters;
+  });
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const pendingTargetScheduleRef = useRef(null);
+  const [activePopover, setActivePopover] = useState(null);
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+
+  // ── FAZ 2: New State ──
+  const [lunchBreakFilter, setLunchBreakFilter] = useState(false);
+  const [sleepyFilter, setSleepyFilter] = useState(false);
+  const [historyNoGapFilter, setHistoryNoGapFilter] = useState(false);
+  const [toastData, setToastData] = useState(null);
+  const [savedSchedules, setSavedSchedules] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('saved_schedules') || '[]');
+    } catch { return []; }
+  });
+
+  // Persist saved schedules to localStorage
+  useEffect(() => {
+    localStorage.setItem('saved_schedules', JSON.stringify(savedSchedules));
+  }, [savedSchedules]);
+
+  // Toast auto-dismiss
+  useEffect(() => {
+    if (!toastData) return;
+    const id = setTimeout(() => {
+      setToastData(prev => prev ? { ...prev, exiting: true } : null);
+      setTimeout(() => setToastData(null), 250);
+    }, 3000);
+    return () => clearTimeout(id);
+  }, [toastData]);
+
+  // Check if TAR101 exists in course data
+  const hasTAR101 = useMemo(() => {
+    if (!courseData) return false;
+    return courseData.courses.some(c => c.code === 'TAR101');
+  }, [courseData]);
+
+  const instructorsByCourse = useMemo(() => {
+    if (!courseData) return {};
+    return extractInstructorsByCourse(courseData.courses);
+  }, [courseData]);
+
+  const allCourseCodes = useMemo(() => {
+    if (!courseData) return [];
+    return courseData.courses.map(c => c.code);
+  }, [courseData]);
+
+  // Memoized schedules generation
+  const schedules = useMemo(() => {
+    if (!courseData) return null;
+    return generateSchedules(courseData.courses, freeDays, instructorFilters, 500);
+  }, [courseData, freeDays, instructorFilters]);
+
+  // ── FAZ 2: Post-filter with smart filters (AND logic) ──
+  const filteredSchedules = useMemo(() => {
+    if (!schedules) return null;
+    if (!lunchBreakFilter && !sleepyFilter && !historyNoGapFilter) return schedules;
+
+    return schedules.filter(sch => {
+      // 1. Lunch Break Filter (12:30 - 13:20) ile N-1 Toleransı:
+      // Programdaki aktif ders günlerini say. 12:30-13:20 aralığında ders çakışması olan gün sayısını hesapla.
+      // Çakışma sayısı en fazla 1 (<= 1) olan programları da filtreyi geçmiş kabul et.
+      if (lunchBreakFilter) {
+        const LUNCH_START = 750; // 12:30 = 750 dk
+        const LUNCH_END = 800;   // 13:20 = 800 dk
+        const daysWithLunchConflict = new Set();
+        for (const slot of sch.slots) {
+          const sStart = timeToMinutes(slot.start);
+          const sEnd = timeToMinutes(slot.end);
+          // Katı < ve > sınır kontrolü: 13:30'da başlayan ders (810 dk) < 800 olmadığı için çakışmaz
+          if (sStart < LUNCH_END && sEnd > LUNCH_START) {
+            daysWithLunchConflict.add(slot.day);
+          }
+        }
+        if (daysWithLunchConflict.size > 1) return false;
+      }
+
+      // 2. Sleepy Filter (Toleranslı Algoritma — N-1 Kuralı):
+      // Programdaki günlerin en fazla 1 tanesinde 10:00'dan önce başlayan ders bulunmasına izin ver.
+      // Geri kalan tüm aktif günlerde dersler 10:00 veya sonrasında başlamalıdır.
+      if (sleepyFilter) {
+        const daysWithEarlySlot = new Set();
+        for (const slot of sch.slots) {
+          if (timeToMinutes(slot.start) < 600) { // 10:00 öncesi (08:30, 09:30)
+            daysWithEarlySlot.add(slot.day);
+          }
+        }
+        if (daysWithEarlySlot.size > 1) return false;
+      }
+
+      // 3. History No Gap (TAR101): TAR101 must be back-to-back with another course on same day
+      if (historyNoGapFilter && hasTAR101) {
+        const tar101Slots = sch.slots.filter(s => s.courseCode === 'TAR101');
+        if (tar101Slots.length > 0) {
+          const hasBackToBack = tar101Slots.every(tarSlot => {
+            const tarStart = timeToMinutes(tarSlot.start);
+            const tarEnd = timeToMinutes(tarSlot.end);
+            const sameDayOtherSlots = sch.slots.filter(s =>
+              s.day === tarSlot.day && s.courseCode !== 'TAR101'
+            );
+            if (sameDayOtherSlots.length === 0) return true; // TAR101 alone on that day is fine
+            // Check if any other course ends right when TAR101 starts or starts right when TAR101 ends
+            return sameDayOtherSlots.some(other => {
+              const otherEnd = timeToMinutes(other.end);
+              const otherStart = timeToMinutes(other.start);
+              // Allow 10 min gap tolerance (e.g., 17:20 end -> 17:30 start)
+              return Math.abs(otherEnd - tarStart) <= 10 || Math.abs(tarEnd - otherStart) <= 10;
+            });
+          });
+          if (!hasBackToBack) return false;
+        }
+      }
+
+      return true;
+    });
+  }, [schedules, lunchBreakFilter, sleepyFilter, historyNoGapFilter, hasTAR101]);
+
+  // Reset index when filtered schedules change, or jump to pending target schedule
+  useEffect(() => {
+    if (!filteredSchedules || filteredSchedules.length === 0) {
+      setCurrentIndex(0);
+      pendingTargetScheduleRef.current = null;
+      return;
+    }
+    if (pendingTargetScheduleRef.current) {
+      const targetKey = pendingTargetScheduleRef.current;
+      const foundIdx = filteredSchedules.findIndex(s => JSON.stringify(s.selections) === targetKey);
+      if (foundIdx >= 0) {
+        setCurrentIndex(foundIdx);
+      } else {
+        setCurrentIndex(0);
+      }
+      pendingTargetScheduleRef.current = null;
+    } else {
+      setCurrentIndex(0);
+    }
+  }, [filteredSchedules]);
+
+  // Handlers
+  const handleDayToggle = useCallback((day) => {
+    setFreeDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]);
+  }, []);
+
+  const handleFridayToggle = useCallback(() => {
+    setFreeDays(prev => prev.includes('Cuma') ? prev.filter(d => d !== 'Cuma') : [...prev, 'Cuma']);
+  }, []);
+
+  const handleInstructorToggle = useCallback((courseCode, instName) => {
+    setInstructorFilters(prev => {
+      const cur = prev[courseCode] ? [...prev[courseCode]] : [];
+      const updated = cur.includes(instName) ? cur.filter(x => x !== instName) : [...cur, instName];
+      return { ...prev, [courseCode]: updated };
+    });
+  }, []);
+
+  const handleSelectAll = useCallback((courseCode) => {
+    const list = instructorsByCourse[courseCode] || [];
+    setInstructorFilters(prev => ({ ...prev, [courseCode]: list.map(i => i.name) }));
+  }, [instructorsByCourse]);
+
+  const handleClearAll = useCallback((courseCode) => {
+    setInstructorFilters(prev => ({ ...prev, [courseCode]: [] }));
+  }, []);
+
+  const handleBlockClick = useCallback((block, rect) => {
+    setActivePopover({
+      block,
+      x: Math.min(rect.right + 10, window.innerWidth - 370),
+      y: Math.min(rect.top, window.innerHeight - 320)
+    });
+  }, []);
+
+  const handleClosePopover = useCallback(() => {
+    setActivePopover(null);
+  }, []);
+
+  const handleToggleExportMenu = useCallback(() => {
+    setIsExportMenuOpen(prev => !prev);
+  }, []);
+
+  // ── FAZ 2: Smart filter toggles ──
+  const handleLunchBreakToggle = useCallback(() => {
+    setLunchBreakFilter(prev => !prev);
+  }, []);
+
+  const handleSleepyToggle = useCallback(() => {
+    setSleepyFilter(prev => !prev);
+  }, []);
+
+  const handleHistoryNoGapToggle = useCallback(() => {
+    setHistoryNoGapFilter(prev => !prev);
+  }, []);
+
+  // ── FAZ 2: Dev toast ──
+  const handleShowDevToast = useCallback(() => {
+    setToastData({
+      icon: '🚧',
+      message: 'Henüz geliştirme aşamasında! Diğer bölümler yakında eklenecek.',
+      type: 'warning'
+    });
+  }, []);
+
+  const handleDismissToast = useCallback(() => {
+    setToastData(prev => prev ? { ...prev, exiting: true } : null);
+    setTimeout(() => setToastData(null), 250);
+  }, []);
+
+  // ── FAZ 2: Bookmark handlers ──
+  const isCurrentSaved = useMemo(() => {
+    if (!filteredSchedules || filteredSchedules.length === 0) return false;
+    const current = filteredSchedules[currentIndex];
+    if (!current) return false;
+    return savedSchedules.some(s =>
+      JSON.stringify(s.selections) === JSON.stringify(current.selections)
+    );
+  }, [filteredSchedules, currentIndex, savedSchedules]);
+
+  const handleToggleBookmark = useCallback(() => {
+    if (!filteredSchedules || filteredSchedules.length === 0) return;
+    const current = filteredSchedules[currentIndex];
+    if (!current) return;
+
+    const selKey = JSON.stringify(current.selections);
+    const exists = savedSchedules.findIndex(s => JSON.stringify(s.selections) === selKey);
+
+    if (exists >= 0) {
+      setSavedSchedules(prev => prev.filter((_, i) => i !== exists));
+      setToastData({ icon: '🗑️', message: 'Program favorilerden kaldırıldı.', type: 'warning' });
+    } else {
+      setSavedSchedules(prev => [...prev, {
+        originalIndex: currentIndex,
+        selections: current.selections,
+        slots: current.slots,
+        score: current.score
+      }]);
+      setToastData({ icon: '⭐', message: 'Program favorilere kaydedildi!', type: 'warning' });
+    }
+  }, [filteredSchedules, currentIndex, savedSchedules]);
+
+  const handleRemoveSaved = useCallback((idx) => {
+    setSavedSchedules(prev => prev.filter((_, i) => i !== idx));
+    setToastData({ icon: '🗑️', message: 'Favori kaldırıldı.', type: 'warning' });
+  }, []);
+
+  // ── FAZ 3: Global Reset ──
+  const handleGlobalReset = useCallback(() => {
+    const map = extractInstructorsByCourse(courseData ? courseData.courses : DEFAULT_DATA.courses);
+    const resetFilters = {};
+    for (const [code, insts] of Object.entries(map)) {
+      resetFilters[code] = insts.map(i => i.name);
+    }
+    setInstructorFilters(resetFilters);
+    setFreeDays([]);
+    setLunchBreakFilter(false);
+    setSleepyFilter(false);
+    setHistoryNoGapFilter(false);
+    setCurrentIndex(0);
+    setToastData({ icon: '🔄', message: 'Tüm filtreler ve kısıtlar varsayılan durumuna sıfırlandı.', type: 'warning' });
+  }, [courseData]);
+
+  // ── FAZ 3: State Geri Çağırma (Alternatiflerden Kök Filtreye Geçiş) ──
+  const handleLoadSavedSchedule = useCallback((saved) => {
+    if (!saved || !saved.slots) return;
+
+    // 1. Kaydedilen programdaki ders ve hocaları analiz et
+    const newFilters = {};
+    for (const code of allCourseCodes) {
+      newFilters[code] = [];
+    }
+    saved.slots.forEach(slot => {
+      if (slot.courseCode && slot.instructor) {
+        if (!newFilters[slot.courseCode]) {
+          newFilters[slot.courseCode] = [];
+        }
+        if (!newFilters[slot.courseCode].includes(slot.instructor)) {
+          newFilters[slot.courseCode].push(slot.instructor);
+        }
+      }
+    });
+    // Hoca bilgisi belirtilmemiş dersler için tüm hocaları koru
+    for (const code of allCourseCodes) {
+      if (!newFilters[code] || newFilters[code].length === 0) {
+        const instList = instructorsByCourse[code] || [];
+        newFilters[code] = instList.map(i => i.name);
+      }
+    }
+
+    // 2. Kayıtlı programdaki günlerle çakışan freeDays varsa kaldır
+    const daysInSaved = new Set(saved.slots.map(s => s.day));
+    setFreeDays(prev => prev.filter(d => !daysInSaved.has(d)));
+
+    // 3. Hedef program anahtarını işaretle (filteredSchedules hesaplandığında doğrudan bu programa zıplar)
+    const selKey = JSON.stringify(saved.selections);
+    pendingTargetScheduleRef.current = selKey;
+
+    // 4. Öğretim Üyesi Filtresini doğrudan bu hocalarla güncelle
+    setInstructorFilters(newFilters);
+
+    // 5. Görüntüleyiciye yumuşak kaydır ve kullanıcıya bilgi ver
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setToastData({ icon: '🎯', message: `Program #${saved.originalIndex + 1} yüklendi ve ilgili hocalar seçildi.`, type: 'warning' });
+  }, [allCourseCodes, instructorsByCourse]);
+
+  // Global click listener to close popover / export menu
+  useEffect(() => {
+    const onGlobalClick = () => {
+      setActivePopover(null);
+      setIsExportMenuOpen(false);
+    };
+    window.addEventListener('click', onGlobalClick);
+    return () => window.removeEventListener('click', onGlobalClick);
+  }, []);
+
+  // Keyboard navigation — use filteredSchedules
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (!filteredSchedules || filteredSchedules.length === 0) return;
+      if (e.target.tagName === 'INPUT') return;
+      const total = filteredSchedules.length;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setCurrentIndex(i => Math.max(0, i - 1));
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setCurrentIndex(i => Math.min(total - 1, i + 1));
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        setCurrentIndex(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        setCurrentIndex(total - 1);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [filteredSchedules]);
+
+  const currentSchedule = filteredSchedules && filteredSchedules[currentIndex] ? filteredSchedules[currentIndex] : null;
+
+  return h('div', { className: 'app' },
+    // Toast
+    h(ToastNotification, { toast: toastData, onDismiss: handleDismissToast }),
+
+    // Enhanced Header
+    h(HeaderEnhanced, { theme, onToggleTheme: handleToggleTheme, onShowDevToast: handleShowDevToast }),
+
+    h('div', { className: 'main-layout' },
+      h('div', { className: 'sidebar' },
+        h(CourseInput, { courseData }),
+        h(GlobalResetButton, { onReset: handleGlobalReset }),
+        h(ConstraintPanel, {
+          freeDays,
+          onDayToggle: handleDayToggle,
+          onFridayToggle: handleFridayToggle
+        }),
+        // Smart Filters Panel
+        h(SmartFiltersPanel, {
+          lunchBreak: lunchBreakFilter,
+          onLunchBreakToggle: handleLunchBreakToggle,
+          sleepy: sleepyFilter,
+          onSleepyToggle: handleSleepyToggle,
+          historyNoGap: historyNoGapFilter,
+          onHistoryNoGapToggle: handleHistoryNoGapToggle,
+          hasTAR101
+        }),
+        h(InstructorFiltersPanel, {
+          instructorsByCourse,
+          instructorFilters,
+          onInstructorToggle: handleInstructorToggle,
+          onSelectAll: handleSelectAll,
+          onClearAll: handleClearAll
+        })
+      ),
+
+      h('div', null,
+        !filteredSchedules ? (
+          h('div', { className: 'panel' },
+            h('div', { className: 'empty-state' },
+              h('div', { className: 'empty-state__icon' }, '🎓'),
+              h('div', { className: 'empty-state__title' }, 'Program Oluşturmaya Hazır')
+            )
+          )
+        ) : filteredSchedules.length === 0 ? (
+          h('div', { className: 'panel' },
+            h('div', { className: 'empty-state' },
+              h('div', { className: 'empty-state__icon' }, '🔍'),
+              h('div', { className: 'empty-state__title', style: { color: 'var(--accent-warning)' } },
+                'Seçilen Kriterlere Uygun Program Bulunamadı'
+              ),
+              h('div', { className: 'empty-state__text' },
+                'Lütfen sol taraftaki hoca seçimlerini genişletin, boş gün kısıtını kaldırın veya akıllı filtreleri kontrol edin.'
+              )
+            )
+          )
+        ) : (
+          h('div', { className: 'panel fade-in', id: 'schedule-results-panel' },
+            h('div', { className: 'panel__header' },
+              h('div', { className: 'panel__icon' }, '📅'),
+              h('div', null,
+                h('h2', { className: 'panel__title' }, 'Ders Programı'),
+                h('div', { style: { fontSize: '0.68rem', color: 'var(--text-tertiary)' } },
+                  schedules && schedules.length !== filteredSchedules.length
+                    ? `${filteredSchedules.length} / ${schedules.length} program (filtreli)`
+                    : 'Ders bloklarına tıklayarak hoca ve alternatif şubeleri inceleyebilirsiniz'
+                )
+              ),
+              h('div', { style: { marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' } },
+                h(BookmarkButton, { isSaved: isCurrentSaved, onToggle: handleToggleBookmark }),
+                h('span', {
+                  className: `compact-label compact-label--${
+                    currentSchedule.score.totalGap <= 60 ? 'excellent' : currentSchedule.score.totalGap <= 120 ? 'good' : 'fair'
+                  }`
+                }, currentSchedule.score.totalGap === 0 ? 'Mükemmel' : currentSchedule.score.totalGap <= 60 ? 'Çok İyi' : 'İyi'),
+                h(ExportDropdown, {
+                  isOpen: isExportMenuOpen,
+                  onToggle: handleToggleExportMenu,
+                  onExport: (format) => exportSchedule(format, currentIndex, filteredSchedules)
+                })
+              )
+            ),
+
+            h('div', { className: 'panel__body' },
+              h(StatsGrid, {
+                total: filteredSchedules.length,
+                score: currentSchedule.score
+              }),
+
+              h(AdvancedPagination, {
+                currentIndex,
+                total: filteredSchedules.length,
+                onIndexChange: setCurrentIndex
+              }),
+
+              h('div', { style: { marginBottom: '16px' } },
+                h('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '4px' } },
+                  h('span', { style: { fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: '600' } }, 'Zaman Kompaktlığı'),
+                  h('span', { style: { fontSize: '0.72rem', color: 'var(--text-secondary)' } },
+                    `Günlük ortalama ${currentSchedule.score.avgGapPerDay} dk ara`
+                  )
+                ),
+                h('div', { className: 'score-bar' },
+                  h('div', {
+                    className: `score-bar__fill score-bar__fill--${
+                      currentSchedule.score.totalGap <= 60 ? 'excellent' : currentSchedule.score.totalGap <= 120 ? 'good' : 'fair'
+                    }`,
+                    style: { width: `${Math.max(5, 100 - (currentSchedule.score.totalGap / 3))}%` }
+                  })
+                )
+              ),
+
+              h(ScheduleTable, {
+                schedule: currentSchedule,
+                allCourseCodes,
+                onBlockClick: handleBlockClick
+              }),
+
+              h('div', { style: { marginTop: '16px', fontSize: '0.72rem', color: 'var(--text-tertiary)' } },
+                h('strong', { style: { color: 'var(--text-secondary)' } }, 'Seçili Şube Kombinasyonu: '),
+                h('div', { className: 'sel-tags' },
+                  currentSchedule.selections.map((sel, idx) => {
+                    const comp = sel.component !== 'all' ? (sel.component === 'lab' ? ' Lab' : ' Teori') : '';
+                    const altText = sel.hasAlternative ? ` (Alt: ${sel.allSections.map(s => `Ş.${s.section}`).join(', ')})` : '';
+                    return h('span', { key: idx, className: 'sel-tag' },
+                      `${sel.courseCode}${comp} → Ş.${sel.section}${altText}`
+                    );
+                  })
+                )
+              )
+            )
+          )
+        ),
+
+        // Saved Schedules Panel (Alternatiflerim)
+        h(SavedSchedulesPanel, {
+          savedSchedules,
+          onLoadSchedule: handleLoadSavedSchedule,
+          onRemove: handleRemoveSaved
+        })
+      )
+    ),
+
+    h(PopoverCard, {
+      popoverData: activePopover,
+      onClose: handleClosePopover
+    }),
+
+    // Footer Signature
+    h(FooterSignature)
+  );
+}
+
+// ============================================================
+// EXPORT ENGINE
+// ============================================================
+async function exportSchedule(format, currentIdx, schedules) {
+  const sch = schedules[currentIdx];
+  const prefix = `ders_programi_alternatif_${currentIdx + 1}`;
+
+  if (format === 'json') {
+    const data = {
+      programNo: currentIdx + 1,
+      toplamProgram: schedules.length,
+      kompaktlikSkoru: sch.score,
+      dersler: sch.selections.map(s => ({
+        dersKodu: s.courseCode,
+        dersAdi: s.courseName,
+        bilesen: s.component,
+        secilenSube: s.section,
+        ayniSaattekiAlternatifSubeler: s.allSections || [],
+        saatler: s.slots.map(sl => ({
+          gun: sl.day,
+          baslangic: sl.start,
+          bitis: sl.end,
+          hoca: sl.instructor,
+          derslik: sl.room
+        }))
+      }))
+    };
+    downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), `${prefix}.json`);
+    return;
+  }
+
+  if (format === 'excel') {
+    exportToExcel(sch, prefix);
+    return;
+  }
+
+  const captureEl = document.getElementById('schedule-capture-area');
+  if (!captureEl) return;
+
+  if (typeof html2canvas === 'function') {
+    try {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      const canvas = await html2canvas(captureEl, {
+        scale: 2,
+        backgroundColor: isLight ? '#ffffff' : '#0a0e1a',
+        useCORS: true,
+        logging: false
+      });
+
+      if (format === 'png') {
+        canvas.toBlob((blob) => {
+          downloadBlob(blob, `${prefix}.png`);
+        }, 'image/png');
+      } else if (format === 'jpeg') {
+        canvas.toBlob((blob) => {
+          downloadBlob(blob, `${prefix}.jpg`, 0.95);
+        }, 'image/jpeg', 0.95);
+      } else if (format === 'pdf') {
+        if (window.jspdf && window.jspdf.jsPDF) {
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('landscape', 'pt', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+
+          pdf.setFillColor(isLight ? 255 : 10, isLight ? 255 : 14, isLight ? 255 : 26);
+          pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
+
+          pdf.setFontSize(16);
+          pdf.setTextColor(isLight ? 20 : 240, isLight ? 30 : 245, isLight ? 50 : 255);
+          pdf.text(`Gazi Üniversitesi Ders Programı — Alternatif ${currentIdx + 1} / ${schedules.length}`, 30, 35);
+
+          pdf.setFontSize(10);
+          pdf.setTextColor(isLight ? 100 : 150, isLight ? 110 : 160, isLight ? 130 : 180);
+          pdf.text(`Aktif Gün: ${sch.score.activeDays} | Boşluk: ${sch.score.totalGap} dk | Haftalık Ders: ${sch.score.totalHours} saat`, 30, 52);
+
+          const imgData = canvas.toDataURL('image/png');
+          const availableWidth = pdfWidth - 60;
+          const availableHeight = pdfHeight - 80;
+          const imgRatio = canvas.width / canvas.height;
+          let renderW = availableWidth;
+          let renderH = availableWidth / imgRatio;
+
+          if (renderH > availableHeight) {
+            renderH = availableHeight;
+            renderW = availableHeight * imgRatio;
+          }
+
+          pdf.addImage(imgData, 'PNG', 30, 65, renderW, renderH);
+          pdf.save(`${prefix}.pdf`);
+        } else {
+          window.print();
+        }
+      }
+    } catch (err) {
+      console.error('Export error:', err);
+      if (format === 'pdf') window.print();
+      else alert('Görsel oluşturulurken bir hata meydana geldi: ' + err.message);
+    }
+  } else {
+    if (format === 'pdf') window.print();
+    else alert('Yazdırma seçeneğini kullanabilirsiniz.');
+  }
+}
+
+function exportToExcel(sch, prefix) {
+  if (window.XLSX && window.XLSX.utils) {
+    const wb = window.XLSX.utils.book_new();
+
+    const activeDays = DAYS.filter(d => sch.slots.some(s => s.day === d));
+    const matrixData = [['Saat', ...activeDays]];
+
+    TIME_SLOTS.forEach((slot, si) => {
+      const row = [SLOT_LABELS[si]];
+      activeDays.forEach(day => {
+        const found = sch.slots.find(s => {
+          const sIdx = getSlotIndex(s.start);
+          const span = getSlotSpan(s.start, s.end);
+          return s.day === day && si >= sIdx && si < sIdx + span;
+        });
+        if (found) {
+          const alt = found.hasAlternative ? ' [Alt Şubeler Var]' : '';
+          row.push(`${found.courseCode} (Ş.${found.sectionNum}) - ${found.instructor}${alt}`);
+        } else {
+          row.push('');
+        }
+      });
+      matrixData.push(row);
+    });
+
+    const wsMatrix = window.XLSX.utils.aoa_to_sheet(matrixData);
+    window.XLSX.utils.book_append_sheet(wb, wsMatrix, 'Haftalık Program');
+
+    const detailRows = [
+      ['Ders Kodu', 'Ders Adı', 'Bileşen', 'Seçilen Şube', 'Öğretim Üyesi', 'Derslik', 'Gün ve Saatler', 'Aynı Saatteki Alternatifler']
+    ];
+
+    sch.selections.forEach(sel => {
+      const times = sel.slots.map(s => `${s.day} ${s.start}-${s.end}`).join(', ');
+      const rooms = Array.from(new Set(sel.slots.map(s => s.room).filter(Boolean))).join(', ');
+      const instrs = Array.from(new Set(sel.slots.map(s => s.instructor).filter(Boolean))).join(', ');
+      const alts = sel.allSections && sel.allSections.length > 1
+        ? sel.allSections.map(a => `Ş.${a.section} (${a.instructor})`).join(' | ')
+        : 'Yok';
+
+      detailRows.push([
+        sel.courseCode,
+        sel.courseName,
+        sel.component === 'lab' ? 'Laboratuvar' : 'Teori',
+        sel.section,
+        instrs,
+        rooms,
+        times,
+        alts
+      ]);
+    });
+
+    const wsDetail = window.XLSX.utils.aoa_to_sheet(detailRows);
+    window.XLSX.utils.book_append_sheet(wb, wsDetail, 'Ders Detayları');
+
+    window.XLSX.writeFile(wb, `${prefix}.xlsx`);
+  } else {
+    let csv = '\uFEFFSaat;' + DAYS.join(';') + '\n';
+    TIME_SLOTS.forEach((slot, si) => {
+      let line = SLOT_LABELS[si];
+      DAYS.forEach(day => {
+        const found = sch.slots.find(s => {
+          const sIdx = getSlotIndex(s.start);
+          const span = getSlotSpan(s.start, s.end);
+          return s.day === day && si >= sIdx && si < sIdx + span;
+        });
+        line += ';' + (found ? `"${found.courseCode} Ş.${found.sectionNum} (${found.instructor})"` : '""');
+      });
+      csv += line + '\n';
+    });
+    downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), `${prefix}.csv`);
+  }
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// MOUNT APP WITH REACT 18 ROOT
+// ============================================================
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(h(App));
+  </script>
+</body>
+</html>
