@@ -38,10 +38,7 @@ const Header = React.memo(function Header({ theme, onToggleTheme }) {
         </div>
         <ThemeToggle theme={theme} onToggle={onToggleTheme} />
       </div>
-      <h1 className="header__title">Ders Programı Optimizasyonu</h1>
-      <p className="header__subtitle">
-        Sıfır çakışmalı, optimize edilmiş ve akıllı gruplamalı ders programı mimarisi
-      </p>
+      <h1 className="header__title">Kendi Ders Programını Tasarla</h1>
     </header>
   );
 });

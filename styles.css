@@ -243,20 +243,27 @@ body::before {
 }
 
 .header__title {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
   font-size: var(--font-size-3xl);
-  font-weight: 800;
-  background: var(--gradient-primary);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  background: linear-gradient(135deg, #ffffff 10%, #e0e7ff 50%, #818cf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: var(--space-sm);
-  letter-spacing: -0.5px;
+  margin-bottom: var(--space-xs);
+  line-height: 1.25;
+}
+
+[data-theme="light"] .header__title, body.light .header__title {
+  background: linear-gradient(135deg, #0f172a 10%, #312e81 50%, #4f46e5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .header__subtitle {
-  font-size: var(--font-size-base);
-  color: var(--text-secondary);
-  font-weight: 400;
+  display: none !important;
 }
 
 /* --- Main Layout --- */

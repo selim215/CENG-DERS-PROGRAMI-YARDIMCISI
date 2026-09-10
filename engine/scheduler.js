@@ -13,17 +13,26 @@
  *   - Student can pick Theory Section 1 + Lab Section 2.
  *   - Each component is a separate decision unit.
  */
-function buildDecisionUnits(courses) {
+/**
+ * Build the "decision units" from course data.
+ * Supports lockedSections hard constraint.
+ */
+function buildDecisionUnits(courses, instructorFilters = {}, lockedSections = {}) {
   const units = [];
   
   for (const course of courses) {
+    const allowedInstructors = instructorFilters[course.code] || null;
+
     if (course.type === 'common') {
       // Common courses: group all components by section number
-      // Each section number = one choice that includes all component slots for that section
+      const lockedSec = lockedSections[course.code];
       const sectionMap = {};
       
       for (const comp of course.components) {
         for (const sec of comp.sections) {
+          if (lockedSec !== undefined && sec.section !== lockedSec) continue;
+          if (lockedSec === undefined && allowedInstructors && !allowedInstructors.includes(sec.instructor)) continue;
+
           if (!sectionMap[sec.section]) {
             sectionMap[sec.section] = {
               section: sec.section,
@@ -49,46 +58,59 @@ function buildDecisionUnits(courses) {
         }
       }
       
-      units.push({
-        id: course.code,
-        courseCode: course.code,
-        courseName: course.name,
-        type: 'common',
-        label: `${course.code} - ${course.name}`,
-        options: Object.values(sectionMap)
-      });
+      const options = Object.values(sectionMap);
+      if (options.length > 0) {
+        units.push({
+          id: course.code,
+          courseCode: course.code,
+          courseName: course.name,
+          type: 'common',
+          label: `${course.code} - ${course.name}`,
+          options
+        });
+      }
       
     } else {
       // Departmental courses: each component is a separate decision
       for (const comp of course.components) {
         const compLabel = comp.component === 'theory' ? 'Teori' : 
                          comp.component === 'lab' ? 'Lab' : comp.component;
-        
-        units.push({
-          id: `${course.code}_${comp.component}`,
-          courseCode: course.code,
-          courseName: course.name,
-          type: 'departmental',
-          component: comp.component,
-          label: `${course.code} ${compLabel} - ${course.name}`,
-          options: comp.sections.map(sec => ({
-            section: sec.section,
-            slots: sec.slots.map(s => ({
-              ...s,
-              courseCode: course.code,
-              courseName: course.name,
-              component: comp.component,
-              sectionNum: sec.section,
-              instructor: sec.instructor || '',
-              room: sec.room || ''
-            })),
-            details: [{
-              component: comp.component,
-              instructor: sec.instructor,
-              room: sec.room
-            }]
-          }))
+        const unitId = `${course.code}_${comp.component}`;
+        const lockedSec = lockedSections[unitId];
+
+        const validSections = comp.sections.filter(sec => {
+          if (lockedSec !== undefined) return sec.section === lockedSec;
+          if (allowedInstructors && !allowedInstructors.includes(sec.instructor)) return false;
+          return true;
         });
+
+        if (validSections.length > 0) {
+          units.push({
+            id: unitId,
+            courseCode: course.code,
+            courseName: course.name,
+            type: 'departmental',
+            component: comp.component,
+            label: `${course.code} ${compLabel} - ${course.name}`,
+            options: validSections.map(sec => ({
+              section: sec.section,
+              slots: sec.slots.map(s => ({
+                ...s,
+                courseCode: course.code,
+                courseName: course.name,
+                component: comp.component,
+                sectionNum: sec.section,
+                instructor: sec.instructor || '',
+                room: sec.room || ''
+              })),
+              details: [{
+                component: comp.component,
+                instructor: sec.instructor,
+                room: sec.room
+              }]
+            }))
+          });
+        }
       }
     }
   }
@@ -101,11 +123,17 @@ function buildDecisionUnits(courses) {
  * 
  * @param {Array} courses - Course data
  * @param {Array} freeDays - Days to keep free (e.g., ['Cuma'])
+ * @param {Object} instructorFilters - Allowed instructors per course
  * @param {Number} maxResults - Maximum number of results to generate
+ * @param {Object} lockedSections - Hard constraint locked sections { unitId: sectionNum }
+ * @param {Array} previousSelections - Previously selected sections to preserve preferences
  * @returns {Array} Array of valid schedules
  */
-function generateSchedules(courses, freeDays = [], maxResults = 500) {
-  const units = buildDecisionUnits(courses);
+function generateSchedules(courses, freeDays = [], instructorFilters = {}, maxResults = 500, lockedSections = {}, previousSelections = []) {
+  const units = buildDecisionUnits(courses, instructorFilters, lockedSections);
+  const totalExpectedUnits = courses.reduce((acc, c) => acc + (c.type === 'common' ? 1 : c.components.length), 0);
+  if (units.length < totalExpectedUnits) return [];
+
   const results = [];
   
   function backtrack(unitIndex, currentSlots, currentSelections) {
@@ -155,8 +183,25 @@ function generateSchedules(courses, freeDays = [], maxResults = 500) {
   
   backtrack(0, [], []);
   
-  // Sort by compactness score (best first)
-  results.sort((a, b) => a.score.totalGap - b.score.totalGap);
+  // Sort: prioritize keeping previous selections when possible, then compactness score
+  results.sort((a, b) => {
+    if (previousSelections && previousSelections.length > 0) {
+      let aMatches = 0;
+      let bMatches = 0;
+      for (const p of previousSelections) {
+        if (a.selections.some(s => s.courseCode === p.courseCode && s.component === p.component && s.section === p.section)) {
+          aMatches++;
+        }
+        if (b.selections.some(s => s.courseCode === p.courseCode && s.component === p.component && s.section === p.section)) {
+          bMatches++;
+        }
+      }
+      if (bMatches !== aMatches) {
+        return bMatches - aMatches;
+      }
+    }
+    return a.score.totalGap - b.score.totalGap;
+  });
   
   return results;
 }
