@@ -16,29 +16,39 @@ jobs:
       - name: Kodu Klonla
         uses: actions/checkout@v4
 
-      - name: Python Ortamı Kur
+      - name: Python Kur
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Gemini SDK Kur
-        run: |
-          pip install google-genai
 
       - name: Gemini ile Kodu Incele
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python - << 'EOF'
-          import os
-          from google import genai
+          import os, urllib.request, json
 
-          client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
-          response = client.models.generate_content(
-              model="gemini-2.5-flash",
-              contents="Ders programı optimizasyon projesinde kod kalitesi, performans ve güvenlik açısından dikkat edilmesi gereken 3 kritik maddeyi kısaca listele."
-          )
-          print("\n--- GEMINI INCELEME RAPORU ---")
-          print(response.text)
-          print("-------------------------------\n")
+          api_key = os.environ.get("GEMINI_API_KEY")
+          if not api_key:
+              raise ValueError("GEMINI_API_KEY secret bulunamadi!")
+
+          url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+          headers = {"Content-Type": "application/json"}
+          payload = {
+              "contents": [{
+                  "parts": [{"text": "Ders programı optimizasyon web aracı için kod kalitesi, performans ve güvenlik açısından dikkat edilmesi gereken 3 kritik maddeyi kısaca yaz."}]
+              }]
+          }
+
+          req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers=headers)
+          try:
+              with urllib.request.urlopen(req) as response:
+                  res_data = json.loads(response.read().decode('utf-8'))
+                  text = res_data['candidates'][0]['content']['parts'][0]['text']
+                  print("\n================ GEMINI INCELEME RAPORU ================\n")
+                  print(text)
+                  print("\n========================================================\n")
+          except urllib.error.HTTPError as e:
+              print("API Hatasi:", e.code, e.read().decode('utf-8'))
+              raise e
           EOF
