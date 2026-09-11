@@ -32,23 +32,50 @@ jobs:
           if not api_key:
               raise ValueError("GEMINI_API_KEY secret bulunamadi!")
 
-          url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-          headers = {"Content-Type": "application/json"}
+          # 1. API anahtarinin destekledigi aktif modelleri listele
+          list_url = f"https://generativelanguage.googleapis.com/v1beta/models?key={api_key}"
+          req = urllib.request.Request(list_url)
+          
+          with urllib.request.urlopen(req) as resp:
+              models_data = json.loads(resp.read().decode('utf-8'))
+
+          available_models = [
+              m["name"] for m in models_data.get("models", [])
+              if "generateContent" in m.get("supportedGenerationMethods", [])
+          ]
+
+          print("Kullanilabilir Modeller:", available_models)
+
+          if not available_models:
+              raise RuntimeError("Bu API anahtari icin generateContent destekleyen model bulunamadi!")
+
+          # Tercihen flash/pro iceren, yoksa ilk uygun modeli sec
+          selected_model = available_models[0]
+          for m in available_models:
+              if "gemini" in m.lower() and "flash" in m.lower():
+                  selected_model = m
+                  break
+
+          print(f"Secilen Model: {selected_model}")
+
+          # 2. Secilen model ile icerik uret
+          gen_url = f"https://generativelanguage.googleapis.com/v1beta/{selected_model}:generateContent?key={api_key}"
           payload = {
               "contents": [{
-                  "parts": [{"text": "Ders programı optimizasyon web aracı için kod kalitesi, performans ve güvenlik açısından dikkat edilmesi gereken 3 kritik maddeyi kısaca yaz."}]
+                  "parts": [{"text": "Ders programı optimizasyon web uygulamasi icin kod kalitesi, performans ve güvenlik acisindan 3 onemli tavsiye yaz."}]
               }]
           }
 
-          req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers=headers)
-          try:
-              with urllib.request.urlopen(req) as response:
-                  res_data = json.loads(response.read().decode('utf-8'))
-                  text = res_data['candidates'][0]['content']['parts'][0]['text']
-                  print("\n================ GEMINI INCELEME RAPORU ================\n")
-                  print(text)
-                  print("\n========================================================\n")
-          except urllib.error.HTTPError as e:
-              print("API Hatasi:", e.code, e.read().decode('utf-8'))
-              raise e
+          req_gen = urllib.request.Request(
+              gen_url,
+              data=json.dumps(payload).encode('utf-8'),
+              headers={"Content-Type": "application/json"}
+          )
+
+          with urllib.request.urlopen(req_gen) as resp:
+              res = json.loads(resp.read().decode('utf-8'))
+              text = res['candidates'][0]['content']['parts'][0]['text']
+              print("\n================ GEMINI RAPORU ================\n")
+              print(text)
+              print("\n===============================================\n")
           EOF
