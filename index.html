@@ -313,7 +313,7 @@ body::after {
 .instructor-item input[type="checkbox"] {
   accent-color: var(--accent-primary); width: 14px; height: 14px; cursor: pointer;
 }
-.instructor-item__name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.instructor-item__name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; word-break: break-word; }
 .instructor-item__sections {
   font-size: 0.62rem; color: var(--text-tertiary); padding: 1px 5px;
   background: var(--bg-glass); border-radius: 4px; font-variant-numeric: tabular-nums;
@@ -501,6 +501,7 @@ body::after {
   background: none; border: none; color: var(--text-tertiary); font-size: 1.1rem;
   cursor: pointer; line-height: 1; padding: 2px;
 }
+.popover-card__val { color: var(--text-primary); font-weight: 600; white-space: normal; word-break: break-word; }
 .popover-card__close:hover { color: var(--text-primary); }
 .popover-card__row { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; margin-bottom: 6px; }
 .popover-card__icon { width: 18px; text-align: center; color: var(--accent-primary-light); font-size: 0.85rem; }
@@ -670,7 +671,7 @@ body::after {
   margin-top: 3px;
 }
 
-/* Sağ Alan: Geri Sayım + Tarih + Tema Değiştirme (flex-row, items-center, gap-4/16px) */
+/* Sağ Alan: Tarih + Tema Değiştirme (flex-row, items-center, gap-4/16px) */
 .header-right {
   display: flex;
   flex-direction: row;
@@ -681,61 +682,227 @@ body::after {
   min-width: 0;
 }
 
-/* Geri Sayım Sayacı: Tek Satırda Ferah Tasarım */
-.header-countdown-wrapper {
+/* ============================================
+   FEEDBACK & EMOJI REACTIONS
+   ============================================ */
+.feedback-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  padding: 10px 18px;
   background: var(--bg-glass);
-  padding: 5px 12px;
-  border-radius: var(--radius-full);
   border: 1px solid var(--border-primary);
-  white-space: nowrap;
+  border-radius: var(--radius-md);
+  margin-top: 14px;
+  flex-wrap: wrap;
 }
-.header-countdown-label {
-  font-size: 0.65rem;
+.feedback-bar__label {
+  font-size: 0.72rem;
   color: var(--text-tertiary);
   font-weight: 600;
-  letter-spacing: 0.3px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  white-space: nowrap;
 }
-.header-countdown {
-  display: inline-flex;
+.emoji-reactions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.emoji-reaction-item {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 3px;
 }
-.countdown-unit {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 1px;
+.emoji-reaction-btn {
+  position: relative;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), background 0.18s, border-color 0.18s;
+  user-select: none;
 }
-.countdown-value {
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: var(--accent-primary-light);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
+.emoji-reaction-btn:hover {
+  transform: scale(1.2) translateY(-2px);
+  background: var(--bg-glass-hover);
+  border-color: var(--border-secondary);
 }
-.countdown-label-sub {
-  font-size: 0.6rem;
-  color: var(--text-muted);
-  font-weight: 600;
+.emoji-reaction-btn:active {
+  transform: scale(0.95);
 }
-.countdown-separator {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin: 0 1px;
+.emoji-reaction-btn--active {
+  background: rgba(99,102,241,0.18);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 12px rgba(99,102,241,0.3);
 }
-.countdown-expired {
+.emoji-reaction-count {
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--accent-danger);
-  padding: 2px 8px;
+  color: var(--text-tertiary);
+  line-height: 1;
+  transition: all var(--transition-fast);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+.emoji-reaction-count--active {
+  color: var(--accent-primary-light);
+  font-weight: 800;
+  transform: scale(1.1);
+}
+.emoji-reaction-btn .emoji-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: var(--bg-popover);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s, transform 0.18s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  z-index: 100;
+}
+.emoji-reaction-btn:hover .emoji-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.btn-feedback {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
-  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid var(--border-accent);
+  background: rgba(99,102,241,0.12);
+  color: var(--accent-primary-light);
+  font-family: var(--font-family);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+}
+.btn-feedback:hover {
+  background: rgba(99,102,241,0.24);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 12px rgba(99,102,241,0.25);
+}
+/* Feedback Modal */
+.feedback-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: modalFadeIn 0.2s ease-out;
+}
+.feedback-modal-dialog {
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+  width: 100%;
+  max-width: 460px;
+  padding: 28px;
+  animation: modalSlideUp 0.22s cubic-bezier(0.16,1,0.3,1);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.feedback-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.feedback-modal-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.feedback-modal-close {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 1.3rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: color var(--transition-fast);
+}
+.feedback-modal-close:hover { color: var(--text-primary); }
+.feedback-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.feedback-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.feedback-input, .feedback-textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 0.82rem;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  width: 100%;
+  box-sizing: border-box;
+}
+.feedback-input:focus, .feedback-textarea:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+.feedback-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+.btn-feedback-submit {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--gradient-primary);
+  color: white;
+  font-family: var(--font-family);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: 0 4px 16px rgba(99,102,241,0.35);
+}
+.btn-feedback-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(99,102,241,0.5);
+}
+.btn-feedback-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Tarih Rozeti */
@@ -2145,8 +2312,8 @@ const DEFAULT_DATA = { courses: [
     { section:2, instructor:"Dr. Öğr. Üyesi Hüseyin Temuçin", room:"416", slots:[{day:"Perşembe",start:"15:30",end:"17:20"}] }
   ]},
   { component:"lab", sections:[
-    { section:1, instructor:"Dr. Öğr. Üyesi S. T. Şahin Tekin", room:"400", slots:[{day:"Pazartesi",start:"10:30",end:"12:20"}] },
-    { section:2, instructor:"Dr. Öğr. Üyesi S. T. Şahin Tekin", room:"400", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"}] }
+    { section:1, instructor:"Dr. Öğr. Üyesi Sinem Tuğba Şahin Tekin", room:"400", slots:[{day:"Pazartesi",start:"10:30",end:"12:20"}] },
+    { section:2, instructor:"Dr. Öğr. Üyesi Sinem Tuğba Şahin Tekin", room:"400", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"}] }
   ]}
 ]},
 { code:"BM103", name:"Bilg. Müh. Temelleri", type:"departmental", components:[
@@ -2162,9 +2329,9 @@ const DEFAULT_DATA = { courses: [
 ]},
 { code:"FIZ103", name:"Fizik I", type:"common", components:[
   { component:"theory", sections:[
-    { section:1, instructor:"Doç. Dr. Esra E. Tanrıkulu", room:"119", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"},{day:"Çarşamba",start:"08:30",end:"10:20"}] },
+    { section:1, instructor:"Doç. Dr. Esra Erbilen Tanrıkulu", room:"119", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"},{day:"Çarşamba",start:"08:30",end:"10:20"}] },
     { section:2, instructor:"Doç. Dr. Hilal Küçük", room:"117", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"},{day:"Çarşamba",start:"08:30",end:"10:20"}] },
-    { section:3, instructor:"Doç. Dr. Esra E. Tanrıkulu", room:"119", slots:[{day:"Pazartesi",start:"15:30",end:"17:20"},{day:"Çarşamba",start:"10:30",end:"12:20"}] },
+    { section:3, instructor:"Doç. Dr. Esra Erbilen Tanrıkulu", room:"119", slots:[{day:"Pazartesi",start:"15:30",end:"17:20"},{day:"Çarşamba",start:"10:30",end:"12:20"}] },
     { section:4, instructor:"Doç. Dr. Hilal Küçük", room:"117", slots:[{day:"Pazartesi",start:"15:30",end:"17:20"},{day:"Çarşamba",start:"10:30",end:"12:20"}] },
     { section:5, instructor:"Prof. Dr. Yunus Özen", room:"119", slots:[{day:"Salı",start:"08:30",end:"10:20"},{day:"Perşembe",start:"13:30",end:"15:20"}] },
     { section:6, instructor:"Dr. Öğr. Üyesi Kıvanç Uyanık", room:"117", slots:[{day:"Salı",start:"08:30",end:"10:20"},{day:"Perşembe",start:"13:30",end:"15:20"}] },
@@ -2182,18 +2349,18 @@ const DEFAULT_DATA = { courses: [
 ]},
 { code:"MATH101", name:"Mathematics I", type:"common", components:[
   { component:"theory", sections:[
-    { section:1, instructor:"Arş. Gör. Dr. R.S. Altınkaya", room:"122", slots:[{day:"Pazartesi",start:"10:30",end:"12:20"},{day:"Çarşamba",start:"10:30",end:"12:20"}] },
+    { section:1, instructor:"Arş. Gör. Dr. Rümeysa Sacide Altınkaya", room:"122", slots:[{day:"Pazartesi",start:"10:30",end:"12:20"},{day:"Çarşamba",start:"10:30",end:"12:20"}] },
     { section:2, instructor:"Doç. Dr. Anıl Altınkaya", room:"410", slots:[{day:"Pazartesi",start:"10:30",end:"12:20"},{day:"Çarşamba",start:"13:30",end:"15:20"}] },
-    { section:3, instructor:"Arş. Gör. Dr. R.S. Altınkaya", room:"122", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"},{day:"Çarşamba",start:"15:30",end:"17:20"}] },
+    { section:3, instructor:"Arş. Gör. Dr. Rümeysa Sacide Altınkaya", room:"122", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"},{day:"Çarşamba",start:"15:30",end:"17:20"}] },
     { section:4, instructor:"Doç. Dr. Anıl Altınkaya", room:"410", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"},{day:"Çarşamba",start:"15:30",end:"17:20"}] },
-    { section:5, instructor:"Arş. Gör. Dr. R.S. Altınkaya", room:"122", slots:[{day:"Pazartesi",start:"15:30",end:"17:20"},{day:"Çarşamba",start:"13:30",end:"15:20"}] },
-    { section:6, instructor:"Dr. Öğr. Üyesi Ç.C. Özken", room:"122", slots:[{day:"Salı",start:"08:30",end:"10:20"},{day:"Perşembe",start:"13:30",end:"15:20"}] },
+    { section:5, instructor:"Arş. Gör. Dr. Rümeysa Sacide Altınkaya", room:"122", slots:[{day:"Pazartesi",start:"15:30",end:"17:20"},{day:"Çarşamba",start:"13:30",end:"15:20"}] },
+    { section:6, instructor:"Dr. Öğr. Üyesi Çetin Cemal Özeken", room:"122", slots:[{day:"Salı",start:"08:30",end:"10:20"},{day:"Perşembe",start:"13:30",end:"15:20"}] },
     { section:7, instructor:"Dr. Öğr. Üyesi Sezin Çit", room:"410", slots:[{day:"Salı",start:"08:30",end:"10:20"},{day:"Perşembe",start:"13:30",end:"15:20"}] },
-    { section:8, instructor:"Dr. Öğr. Üyesi Ç.C. Özken", room:"122", slots:[{day:"Salı",start:"10:30",end:"12:20"},{day:"Perşembe",start:"10:30",end:"12:20"}] },
+    { section:8, instructor:"Dr. Öğr. Üyesi Çetin Cemal Özeken", room:"122", slots:[{day:"Salı",start:"10:30",end:"12:20"},{day:"Perşembe",start:"10:30",end:"12:20"}] },
     { section:9, instructor:"Dr. Öğr. Üyesi Sezin Çit", room:"410", slots:[{day:"Salı",start:"10:30",end:"12:20"},{day:"Perşembe",start:"15:30",end:"17:20"}] },
-    { section:10, instructor:"Dr. Öğr. Üyesi Ç.C. Özken", room:"122", slots:[{day:"Salı",start:"13:30",end:"15:20"},{day:"Perşembe",start:"08:30",end:"10:20"}] },
+    { section:10, instructor:"Dr. Öğr. Üyesi Çetin Cemal Özeken", room:"122", slots:[{day:"Salı",start:"13:30",end:"15:20"},{day:"Perşembe",start:"08:30",end:"10:20"}] },
     { section:11, instructor:"Doç. Mustafa Aslantaş", room:"410", slots:[{day:"Salı",start:"13:30",end:"15:20"},{day:"Perşembe",start:"08:30",end:"10:20"}] },
-    { section:12, instructor:"Arş. Gör. Dr. B.Z. Sergi Yılmaz", room:"115", slots:[{day:"Salı",start:"13:30",end:"15:20"},{day:"Cuma",start:"13:30",end:"15:20"}] },
+    { section:12, instructor:"Arş. Gör. Dr. Bilge Zehra Sergi Yılmaz", room:"115", slots:[{day:"Salı",start:"13:30",end:"15:20"},{day:"Cuma",start:"13:30",end:"15:20"}] },
     { section:13, instructor:"Doç. Mustafa Aslantaş", room:"410", slots:[{day:"Salı",start:"15:30",end:"17:20"},{day:"Perşembe",start:"10:30",end:"12:20"}] },
     { section:14, instructor:"Dr. Öğr. Üyesi Emre Sevgi", room:"410", slots:[{day:"Çarşamba",start:"10:30",end:"12:20"},{day:"Cuma",start:"13:30",end:"15:20"}] },
     { section:15, instructor:"Dr. Öğr. Üyesi Emre Sevgi", room:"209", slots:[{day:"Çarşamba",start:"13:30",end:"15:20"},{day:"Cuma",start:"10:30",end:"12:20"}] }
@@ -2202,19 +2369,19 @@ const DEFAULT_DATA = { courses: [
 { code:"ENG103", name:"English I", type:"common", components:[
   { component:"theory", sections:[
     { section:1, instructor:"Öğr. Gör. Aslı Islıkaye", room:"117", slots:[{day:"Pazartesi",start:"09:30",end:"12:20"}] },
-    { section:2, instructor:"Öğr. Gör. M. Değirmenci", room:"210", slots:[{day:"Pazartesi",start:"09:30",end:"12:20"}] },
+    { section:2, instructor:"Öğr. Gör. Mehmet Değirmenci", room:"210", slots:[{day:"Pazartesi",start:"09:30",end:"12:20"}] },
     { section:3, instructor:"Öğr. Gör. Aslı Islıkaye", room:"211", slots:[{day:"Pazartesi",start:"13:30",end:"16:20"}] },
-    { section:4, instructor:"Öğr. Gör. M. Değirmenci", room:"210", slots:[{day:"Pazartesi",start:"13:30",end:"16:20"}] },
+    { section:4, instructor:"Öğr. Gör. Mehmet Değirmenci", room:"210", slots:[{day:"Pazartesi",start:"13:30",end:"16:20"}] },
     { section:5, instructor:"Öğr. Gör. Aslı Islıkaye", room:"224", slots:[{day:"Salı",start:"09:30",end:"12:20"}] },
-    { section:6, instructor:"Öğr. Gör. M. Değirmenci", room:"210", slots:[{day:"Salı",start:"09:30",end:"12:20"}] },
+    { section:6, instructor:"Öğr. Gör. Mehmet Değirmenci", room:"210", slots:[{day:"Salı",start:"09:30",end:"12:20"}] },
     { section:7, instructor:"Öğr. Gör. Aslı Islıkaye", room:"224", slots:[{day:"Salı",start:"13:30",end:"15:20"}] },
-    { section:8, instructor:"Öğr. Gör. M. Değirmenci", room:"210", slots:[{day:"Salı",start:"13:30",end:"15:20"}] },
+    { section:8, instructor:"Öğr. Gör. Mehmet Değirmenci", room:"210", slots:[{day:"Salı",start:"13:30",end:"15:20"}] },
     { section:9, instructor:"Öğr. Gör. Aslı Islıkaye", room:"224", slots:[{day:"Çarşamba",start:"13:30",end:"16:20"}] },
-    { section:10, instructor:"Öğr. Gör. M. Değirmenci", room:"210", slots:[{day:"Çarşamba",start:"13:30",end:"16:20"}] },
+    { section:10, instructor:"Öğr. Gör. Mehmet Değirmenci", room:"210", slots:[{day:"Çarşamba",start:"13:30",end:"16:20"}] },
     { section:11, instructor:"Öğr. Gör. Aslı Islıkaye", room:"224", slots:[{day:"Perşembe",start:"09:30",end:"12:20"}] },
     { section:12, instructor:"Öğr. Gör. Aslı Islıkaye", room:"224", slots:[{day:"Perşembe",start:"13:30",end:"16:20"}] },
-    { section:13, instructor:"Öğr. Gör. M. Değirmenci", room:"115", slots:[{day:"Cuma",start:"09:30",end:"12:20"}] },
-    { section:14, instructor:"Öğr. Gör. M. Değirmenci", room:"115", slots:[{day:"Cuma",start:"13:30",end:"16:20"}] }
+    { section:13, instructor:"Öğr. Gör. Mehmet Değirmenci", room:"115", slots:[{day:"Cuma",start:"09:30",end:"12:20"}] },
+    { section:14, instructor:"Öğr. Gör. Mehmet Değirmenci", room:"115", slots:[{day:"Cuma",start:"13:30",end:"16:20"}] }
   ]}
 ]},
 { code:"TAR101", name:"Atatürk İlk. ve İnk. Tarihi I", type:"common", components:[
@@ -2222,9 +2389,9 @@ const DEFAULT_DATA = { courses: [
     { section:3, instructor:"Dr. Serpil Asar", room:"UZAKTAN", slots:[{day:"Çarşamba",start:"17:30",end:"19:20"}] },
     { section:4, instructor:"Dr. Serpil Asar", room:"UZAKTAN", slots:[{day:"Çarşamba",start:"19:30",end:"21:20"}] },
     { section:5, instructor:"Dr. Serpil Asar", room:"UZAKTAN", slots:[{day:"Perşembe",start:"17:30",end:"19:20"}] },
-    { section:6, instructor:"Öğr. Gör. M. Akif Bal", room:"UZAKTAN", slots:[{day:"Perşembe",start:"17:30",end:"19:20"}] },
-    { section:7, instructor:"Öğr. Gör. M. Akif Bal", room:"UZAKTAN", slots:[{day:"Perşembe",start:"19:30",end:"21:20"}] },
-    { section:8, instructor:"Öğr. Gör. M. Akif Bal", room:"UZAKTAN", slots:[{day:"Cuma",start:"17:30",end:"19:20"}] }
+    { section:6, instructor:"Öğr. Gör. Mehmet Akif Bal", room:"UZAKTAN", slots:[{day:"Perşembe",start:"17:30",end:"19:20"}] },
+    { section:7, instructor:"Öğr. Gör. Mehmet Akif Bal", room:"UZAKTAN", slots:[{day:"Perşembe",start:"19:30",end:"21:20"}] },
+    { section:8, instructor:"Öğr. Gör. Mehmet Akif Bal", room:"UZAKTAN", slots:[{day:"Cuma",start:"17:30",end:"19:20"}] }
   ]}
 ]}
 ]};
@@ -2299,29 +2466,18 @@ const ToastNotification = React.memo(function ToastNotification({ toast, onDismi
   );
 });
 
-// 3. Enhanced Header with Logo, Semester, Countdown
+// 3. Enhanced Header with Logo, Semester (Countdown removed)
 const HeaderEnhanced = React.memo(function HeaderEnhanced({ theme, onToggleTheme, onShowDevToast }) {
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
+    const id = setInterval(() => setNow(new Date()), 60000);
     return () => clearInterval(id);
   }, []);
 
   const dateStr = useMemo(() => {
     const d = now;
     return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
-  }, [now]);
-
-  const countdown = useMemo(() => {
-    const target = new Date(2026, 8, 10, 9, 0, 0); // 10.09.2026 09:00:00
-    const diff = target - now;
-    if (diff <= 0) return null;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    return { days, hours, minutes, seconds };
   }, [now]);
 
   return h('header', { className: 'header-enhanced' },
@@ -2356,33 +2512,8 @@ const HeaderEnhanced = React.memo(function HeaderEnhanced({ theme, onToggleTheme
           )
         )
       ),
-      // 3. SAĞ ALAN (Right): Geri sayım sayacı + Tarih + Tema Değiştirme (flex-row, items-center, gap-4)
+      // 3. SAĞ ALAN (Right): Tarih + Tema Değiştirme
       h('div', { className: 'header-right' },
-        // Geri sayım sayacı
-        h('div', { className: 'header-countdown-wrapper', title: 'Ders Seçimine Kalan Süre' },
-          h('span', { className: 'header-countdown-label' }, '⏱️ Kalan:'),
-          countdown ? h('div', { className: 'header-countdown' },
-            h('div', { className: 'countdown-unit' },
-              h('span', { className: 'countdown-value' }, String(countdown.days).padStart(2, '0')),
-              h('span', { className: 'countdown-label-sub' }, 'g')
-            ),
-            h('span', { className: 'countdown-separator' }, ':'),
-            h('div', { className: 'countdown-unit' },
-              h('span', { className: 'countdown-value' }, String(countdown.hours).padStart(2, '0')),
-              h('span', { className: 'countdown-label-sub' }, 's')
-            ),
-            h('span', { className: 'countdown-separator' }, ':'),
-            h('div', { className: 'countdown-unit' },
-              h('span', { className: 'countdown-value' }, String(countdown.minutes).padStart(2, '0')),
-              h('span', { className: 'countdown-label-sub' }, 'dk')
-            ),
-            h('span', { className: 'countdown-separator' }, ':'),
-            h('div', { className: 'countdown-unit' },
-              h('span', { className: 'countdown-value' }, String(countdown.seconds).padStart(2, '0')),
-              h('span', { className: 'countdown-label-sub' }, 'sn')
-            )
-          ) : h('span', { className: 'countdown-expired' }, '⏰ Süre Doldu!')
-        ),
         // Tarih
         h('div', { className: 'header-date-badge' },
           h('span', null, '📆'),
@@ -2963,7 +3094,7 @@ const ScheduleTable = React.memo(function ScheduleTable({ schedule, allCourseCod
   );
 });
 
-// 9. Export Dropdown Component
+// 9. Export Dropdown Component (JSON removed)
 const ExportDropdown = React.memo(function ExportDropdown({ isOpen, onToggle, onExport }) {
   return h('div', { className: 'export-dropdown-wrapper' },
     h('button', {
@@ -3001,7 +3132,7 @@ const ExportDropdown = React.memo(function ExportDropdown({ isOpen, onToggle, on
         h('span', { className: 'export-item__icon' }, '📊'),
         h('div', null,
           h('div', null, 'Excel (.xlsx) İndir'),
-          h('div', { className: 'export-item__desc' }, 'Tablo & Detay')
+          h('div', { className: 'export-item__desc' }, 'Renkli Tablo')
         )
       ),
       h('button', {
@@ -3025,17 +3156,243 @@ const ExportDropdown = React.memo(function ExportDropdown({ isOpen, onToggle, on
           h('div', null, 'JPEG Resmi İndir'),
           h('div', { className: 'export-item__desc' }, 'Sıkıştırılmış')
         )
-      ),
-      h('button', {
-        type: 'button',
-        className: 'export-item',
-        onClick: (e) => { e.preventDefault(); onExport('json'); }
-      },
-        h('span', { className: 'export-item__icon' }, '📋'),
-        h('div', null,
-          h('div', null, 'JSON Verisi İndir'),
-          h('div', { className: 'export-item__desc' }, 'Ham Veri')
+      )
+    )
+  );
+});
+
+// 9b. Emoji Reactions + Feedback Button Bar
+const STORAGE_KEY_REACTION = 'ders_programi_reaction';
+const STORAGE_KEY_COUNTS = 'ders_programi_reaction_counts';
+
+const FeedbackBar = React.memo(function FeedbackBar({ onOpenFeedback }) {
+  // LS'den aktif emoji oku
+  const [activeEmoji, setActiveEmoji] = useState(() => {
+    try { return localStorage.getItem(STORAGE_KEY_REACTION) || null; } catch { return null; }
+  });
+
+  // LS'den sayaçları oku
+  const [counts, setCounts] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_COUNTS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          like: Math.max(0, Number(parsed.like) || 0),
+          useful: Math.max(0, Number(parsed.useful) || 0),
+          dislike: Math.max(0, Number(parsed.dislike) || 0)
+        };
+      }
+    } catch {}
+    const initialActive = (() => {
+      try { return localStorage.getItem(STORAGE_KEY_REACTION) || null; } catch { return null; }
+    })();
+    return {
+      like: initialActive === 'like' ? 1 : 0,
+      useful: initialActive === 'useful' ? 1 : 0,
+      dislike: initialActive === 'dislike' ? 1 : 0
+    };
+  });
+
+  // Çoklu sekme senkronizasyonu
+  useEffect(() => {
+    const handleStorage = (e) => {
+      if (e.key === STORAGE_KEY_COUNTS && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          setCounts({
+            like: Math.max(0, Number(parsed.like) || 0),
+            useful: Math.max(0, Number(parsed.useful) || 0),
+            dislike: Math.max(0, Number(parsed.dislike) || 0)
+          });
+        } catch {}
+      }
+      if (e.key === STORAGE_KEY_REACTION) {
+        setActiveEmoji(e.newValue || null);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
+  const emojis = [
+    { key: 'like', icon: '👍', label: 'Beğendim' },
+    { key: 'useful', icon: '💡', label: 'Faydalı' },
+    { key: 'dislike', icon: '👎', label: 'Beğenmedim' }
+  ];
+
+  const handleEmojiClick = (key) => {
+    const nextEmoji = activeEmoji === key ? null : key;
+    const nextCounts = { ...counts };
+
+    if (activeEmoji === key) {
+      // Seçimi geri al: Tıklanan emojinin sayısını 1 düşür
+      nextCounts[key] = Math.max(0, (nextCounts[key] || 0) - 1);
+    } else {
+      // Önceki aktif emoji varsa onun sayısını 1 düşür
+      if (activeEmoji && (nextCounts[activeEmoji] || 0) > 0) {
+        nextCounts[activeEmoji] = Math.max(0, nextCounts[activeEmoji] - 1);
+      }
+      // Yeni seçilen emojinin sayısını 1 artır
+      nextCounts[key] = (nextCounts[key] || 0) + 1;
+    }
+
+    setActiveEmoji(nextEmoji);
+    setCounts(nextCounts);
+
+    try {
+      if (nextEmoji) {
+        localStorage.setItem(STORAGE_KEY_REACTION, nextEmoji);
+      } else {
+        localStorage.removeItem(STORAGE_KEY_REACTION);
+      }
+      localStorage.setItem(STORAGE_KEY_COUNTS, JSON.stringify(nextCounts));
+    } catch {}
+  };
+
+  return h('div', { className: 'feedback-bar' },
+    h('span', { className: 'feedback-bar__label' }, 'Bu araç nasıldı?'),
+    h('div', { className: 'emoji-reactions' },
+      emojis.map(em =>
+        h('div', { key: em.key, className: 'emoji-reaction-item' },
+          h('button', {
+            type: 'button',
+            className: `emoji-reaction-btn${activeEmoji === em.key ? ' emoji-reaction-btn--active' : ''}`,
+            onClick: () => handleEmojiClick(em.key),
+            'aria-label': `${em.label} (${counts[em.key] || 0})`
+          },
+            em.icon,
+            h('span', { className: 'emoji-tooltip' }, em.label)
+          ),
+          h('span', {
+            className: `emoji-reaction-count${activeEmoji === em.key ? ' emoji-reaction-count--active' : ''}`
+          }, counts[em.key] || 0)
         )
+      )
+    ),
+    h('button', {
+      type: 'button',
+      className: 'btn-feedback',
+      onClick: (e) => { e.preventDefault(); e.stopPropagation(); onOpenFeedback(); }
+    }, '✉️ Geri Bildirim Gönder')
+  );
+});
+
+// 9c. Google Forms Headless Feedback Modal
+// ─────────────────────────────────────────────────────────────────────
+// GOOGLE FORMS BAĞLANTISI:
+//   1. Google Forms'da bir form oluşturun.
+//   2. Formun gönderim URL'sini (formResponse endpoint) GOOGLE_FORM_ACTION_URL'a yazın.
+//      Örn: 'https://docs.google.com/forms/d/e/XXXXXXXX/formResponse'
+//   3. 'E-posta' alanının entry ID'sini ENTRY_EMAIL_ID'ye yazın.
+//      Örn: 'entry.123456789'
+//   4. 'Mesajınız' alanının entry ID'sini ENTRY_MESSAGE_ID'ye yazın.
+//      Örn: 'entry.987654321'
+//   Entry ID'leri: Formu tarayıcıda açıp, ilgili input'un name özniteliğine bakın.
+// ─────────────────────────────────────────────────────────────────────
+const GOOGLE_FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/BURAYA_FORM_ID_YAZIN/formResponse';
+const ENTRY_EMAIL_ID = 'entry.BURAYA_EMAIL_ENTRY_ID';
+const ENTRY_MESSAGE_ID = 'entry.BURAYA_MESAJ_ENTRY_ID';
+
+const FeedbackModal = React.memo(function FeedbackModal({ isOpen, onClose, onSuccess }) {
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  if (!isOpen) return null;
+
+  const validate = () => {
+    const errs = {};
+    if (!email.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) {
+      errs.email = 'Geçerli bir e-posta adresi girin.';
+    }
+    if (!message.trim()) {
+      errs.message = 'Mesaj alanı boş bırakılamaz.';
+    }
+    return errs;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    setErrors({});
+    setSubmitting(true);
+
+    try {
+      // Arka planda headless POST — kullanıcıyı Google'a yönlendirmez
+      const body = new URLSearchParams();
+      body.append(ENTRY_EMAIL_ID, email.trim());
+      body.append(ENTRY_MESSAGE_ID, message.trim());
+      await fetch(GOOGLE_FORM_ACTION_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
+      });
+    } catch (_) {
+      // no-cors modda hata bekleniyor, yoksay
+    }
+
+    setSubmitting(false);
+    setEmail('');
+    setMessage('');
+    onClose();
+    onSuccess();
+  };
+
+  return h('div', {
+    className: 'feedback-modal-backdrop',
+    onClick: onClose
+  },
+    h('div', {
+      className: 'feedback-modal-dialog',
+      onClick: (e) => e.stopPropagation()
+    },
+      h('div', { className: 'feedback-modal-header' },
+        h('div', { className: 'feedback-modal-title' },
+          h('span', null, '✉️'),
+          'Geri Bildirim Gönder'
+        ),
+        h('button', {
+          type: 'button',
+          className: 'feedback-modal-close',
+          onClick: onClose
+        }, '×')
+      ),
+      h('form', { onSubmit: handleSubmit },
+        h('div', { className: 'feedback-field', style: { marginBottom: '14px' } },
+          h('label', { className: 'feedback-label' }, 'E-posta *'),
+          h('input', {
+            type: 'email',
+            className: 'feedback-input',
+            placeholder: 'ornek@mail.com',
+            value: email,
+            onChange: (e) => { setEmail(e.target.value); setErrors(prev => ({ ...prev, email: null })); },
+            required: true,
+            id: 'feedback-email-input'
+          }),
+          errors.email ? h('span', { style: { fontSize: '0.72rem', color: 'var(--accent-danger)', marginTop: '3px' } }, errors.email) : null
+        ),
+        h('div', { className: 'feedback-field', style: { marginBottom: '18px' } },
+          h('label', { className: 'feedback-label' }, 'Mesajınız *'),
+          h('textarea', {
+            className: 'feedback-textarea',
+            placeholder: 'Önerilerinizi, hatalarınızı veya görüşlerinizi yazın...',
+            value: message,
+            onChange: (e) => { setMessage(e.target.value); setErrors(prev => ({ ...prev, message: null })); },
+            required: true,
+            id: 'feedback-message-input'
+          }),
+          errors.message ? h('span', { style: { fontSize: '0.72rem', color: 'var(--accent-danger)', marginTop: '3px' } }, errors.message) : null
+        ),
+        h('button', {
+          type: 'submit',
+          className: 'btn-feedback-submit',
+          disabled: submitting,
+          id: 'feedback-submit-btn'
+        }, submitting ? '⏳ Gönderiliyor...' : '📨 Geri Bildirimi İlet')
       )
     )
   );
@@ -3607,6 +3964,7 @@ function App() {
   const pendingTargetScheduleRef = useRef(null);
   const [activePopover, setActivePopover] = useState(null);
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
   // ── FAZ 2: New State ──
   const [lunchBreakFilter, setLunchBreakFilter] = useState(false);
@@ -4490,6 +4848,9 @@ function App() {
           )
         ),
 
+        // Feedback Bar
+        h(FeedbackBar, { onOpenFeedback: () => setIsFeedbackOpen(true) }),
+
         // Saved Schedules Panel (Alternatiflerim)
         h(SavedSchedulesPanel, {
           savedSchedules,
@@ -4522,6 +4883,13 @@ function App() {
       onExecuteCommand: handleChatbotCommand
     }),
 
+    // Google Forms Feedback Modal
+    h(FeedbackModal, {
+      isOpen: isFeedbackOpen,
+      onClose: () => setIsFeedbackOpen(false),
+      onSuccess: () => setToastData({ icon: '✅', message: 'Geri bildiriminiz başarıyla iletildi! Teşekkür ederiz.', type: 'warning' })
+    }),
+
     // Footer Signature
     h(FooterSignature)
   );
@@ -4533,33 +4901,10 @@ function App() {
 async function exportSchedule(format, currentIdx, schedules) {
   const sch = schedules[currentIdx];
   const prefix = `ders_programi_alternatif_${currentIdx + 1}`;
-
-  if (format === 'json') {
-    const data = {
-      programNo: currentIdx + 1,
-      toplamProgram: schedules.length,
-      kompaktlikSkoru: sch.score,
-      dersler: sch.selections.map(s => ({
-        dersKodu: s.courseCode,
-        dersAdi: s.courseName,
-        bilesen: s.component,
-        secilenSube: s.section,
-        ayniSaattekiAlternatifSubeler: s.allSections || [],
-        saatler: s.slots.map(sl => ({
-          gun: sl.day,
-          baslangic: sl.start,
-          bitis: sl.end,
-          hoca: sl.instructor,
-          derslik: sl.room
-        }))
-      }))
-    };
-    downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), `${prefix}.json`);
-    return;
-  }
+  const SEMESTER_LABEL = 'Dönem: 2026/2027';
 
   if (format === 'excel') {
-    exportToExcel(sch, prefix);
+    exportToExcel(sch, prefix, SEMESTER_LABEL);
     return;
   }
 
@@ -4591,20 +4936,31 @@ async function exportSchedule(format, currentIdx, schedules) {
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = pdf.internal.pageSize.getHeight();
 
+          // Temiz arka plan
           pdf.setFillColor(isLight ? 255 : 10, isLight ? 255 : 14, isLight ? 255 : 26);
           pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
 
-          pdf.setFontSize(16);
-          pdf.setTextColor(isLight ? 20 : 240, isLight ? 30 : 245, isLight ? 50 : 255);
-          pdf.text(`Gazi Üniversitesi Ders Programı — Alternatif ${currentIdx + 1} / ${schedules.length}`, 30, 35);
+          // Üst başlık: sade "Ders Programım"
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(18);
+          pdf.setTextColor(isLight ? 15 : 248, isLight ? 23 : 250, isLight ? 42 : 252);
+          pdf.text('Ders Programım', 32, 36);
 
+          // Sağ üst: Dönem etiketi
+          pdf.setFont('helvetica', 'normal');
           pdf.setFontSize(10);
-          pdf.setTextColor(isLight ? 100 : 150, isLight ? 110 : 160, isLight ? 130 : 180);
-          pdf.text(`Aktif Gün: ${sch.score.activeDays} | Boşluk: ${sch.score.totalGap} dk | Haftalık Ders: ${sch.score.totalHours} saat`, 30, 52);
+          pdf.setTextColor(isLight ? 100 : 160, isLight ? 116 : 163, isLight ? 139 : 188);
+          pdf.text('Dönem: 2026/2027', pdfWidth - 32, 36, { align: 'right' });
+
+          // İnce ayraç çizgisi
+          pdf.setDrawColor(isLight ? 200 : 50, isLight ? 200 : 55, isLight ? 220 : 80);
+          pdf.setLineWidth(0.5);
+          pdf.line(32, 42, pdfWidth - 32, 42);
 
           const imgData = canvas.toDataURL('image/png');
-          const availableWidth = pdfWidth - 60;
-          const availableHeight = pdfHeight - 80;
+          const topOffset = 52;
+          const availableWidth = pdfWidth - 64;
+          const availableHeight = pdfHeight - topOffset - 24;
           const imgRatio = canvas.width / canvas.height;
           let renderW = availableWidth;
           let renderH = availableWidth / imgRatio;
@@ -4614,7 +4970,9 @@ async function exportSchedule(format, currentIdx, schedules) {
             renderW = availableHeight * imgRatio;
           }
 
-          pdf.addImage(imgData, 'PNG', 30, 65, renderW, renderH);
+          // Ortala
+          const xPos = 32 + (availableWidth - renderW) / 2;
+          pdf.addImage(imgData, 'PNG', xPos, topOffset, renderW, renderH);
           pdf.save(`${prefix}.pdf`);
         } else {
           window.print();
@@ -4631,12 +4989,35 @@ async function exportSchedule(format, currentIdx, schedules) {
   }
 }
 
-function exportToExcel(sch, prefix) {
+// Ders başına pastel arka plan renkleri (Excel için)
+const EXCEL_COURSE_COLORS = [
+  { bg: 'FFE2E8FF', font: '1E1B4B' }, // indigo pastel
+  { bg: 'FFEDE9FE', font: '4C1D95' }, // violet pastel
+  { bg: 'FFCFFAFE', font: '164E63' }, // cyan pastel
+  { bg: 'FFD1FAE5', font: '064E3B' }, // green pastel
+  { bg: 'FFFEF3C7', font: '78350F' }, // amber pastel
+  { bg: 'FFFEE2E2', font: '7F1D1D' }, // red pastel
+  { bg: 'FFFCE7F3', font: '831843' }, // pink pastel
+];
+
+function exportToExcel(sch, prefix, semesterLabel) {
   if (window.XLSX && window.XLSX.utils) {
     const wb = window.XLSX.utils.book_new();
-
     const activeDays = DAYS.filter(d => sch.slots.some(s => s.day === d));
-    const matrixData = [['Saat', ...activeDays]];
+
+    // Ders kodu → renk indeksi haritası
+    const courseColorMap = {};
+    const allCodes = [...new Set(sch.slots.map(s => s.courseCode))];
+    allCodes.forEach((code, i) => { courseColorMap[code] = i % EXCEL_COURSE_COLORS.length; });
+
+    // ─── Haftalık Program Sayfası ───
+    // Satır 1: Başlık "Ders Programım" + sağda dönem
+    // Satır 2: Boş
+    // Satır 3: Sütun başlıkları
+    const headerRow1 = ['Ders Programım', ...activeDays.map((_, i) => i === activeDays.length - 1 ? (semesterLabel || 'Dönem: 2026/2027') : '')];
+    const headerRow2 = [''];
+    const colHeaders = ['Saat', ...activeDays];
+    const matrixData = [headerRow1, headerRow2, colHeaders];
 
     TIME_SLOTS.forEach((slot, si) => {
       const row = [SLOT_LABELS[si]];
@@ -4647,8 +5028,7 @@ function exportToExcel(sch, prefix) {
           return s.day === day && si >= sIdx && si < sIdx + span;
         });
         if (found) {
-          const alt = found.hasAlternative ? ' [Alt Şubeler Var]' : '';
-          row.push(`${found.courseCode} (Ş.${found.sectionNum}) - ${found.instructor}${alt}`);
+          row.push(`${found.courseCode}\nŞube ${found.sectionNum}\n${found.instructor || ''}`);
         } else {
           row.push('');
         }
@@ -4657,10 +5037,93 @@ function exportToExcel(sch, prefix) {
     });
 
     const wsMatrix = window.XLSX.utils.aoa_to_sheet(matrixData);
-    window.XLSX.utils.book_append_sheet(wb, wsMatrix, 'Haftalık Program');
 
+    // Sütun genişlikleri
+    wsMatrix['!cols'] = [
+      { wch: 16 }, // Saat sütunu
+      ...activeDays.map(() => ({ wch: 28 }))
+    ];
+
+    // Satır yükseklikleri (başlık + veri satırları)
+    wsMatrix['!rows'] = [
+      { hpt: 28 }, // Başlık satırı
+      { hpt: 8 },  // Boş
+      { hpt: 22 }, // Kolon başlıkları
+      ...TIME_SLOTS.map(() => ({ hpt: 52 })) // Veri satırları
+    ];
+
+    // Hücre stilleri
+    const range = window.XLSX.utils.decode_range(wsMatrix['!ref']);
+    for (let R = range.s.r; R <= range.e.r; R++) {
+      for (let C = range.s.c; C <= range.e.c; C++) {
+        const cellAddr = window.XLSX.utils.encode_cell({ r: R, c: C });
+        if (!wsMatrix[cellAddr]) wsMatrix[cellAddr] = { v: '', t: 's' };
+        const cell = wsMatrix[cellAddr];
+
+        // Ortak kenarlık
+        const border = {
+          top: { style: 'thin', color: { rgb: 'FFD1D5DB' } },
+          bottom: { style: 'thin', color: { rgb: 'FFD1D5DB' } },
+          left: { style: 'thin', color: { rgb: 'FFD1D5DB' } },
+          right: { style: 'thin', color: { rgb: 'FFD1D5DB' } }
+        };
+
+        if (R === 0) {
+          // Ana başlık satırı
+          cell.s = {
+            font: { name: 'Calibri', bold: true, sz: 14, color: { rgb: 'FF1E1B4B' } },
+            fill: { fgColor: { rgb: 'FFE0E7FF' }, patternType: 'solid' },
+            alignment: { horizontal: C === 0 ? 'left' : 'right', vertical: 'center' },
+            border
+          };
+        } else if (R === 2) {
+          // Kolon başlıkları
+          cell.s = {
+            font: { name: 'Calibri', bold: true, sz: 10, color: { rgb: 'FF1E1B4B' } },
+            fill: { fgColor: { rgb: 'FFC7D2FE' }, patternType: 'solid' },
+            alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+            border
+          };
+        } else if (R > 2 && C === 0) {
+          // Saat sütunu
+          cell.s = {
+            font: { name: 'Calibri', bold: true, sz: 9, color: { rgb: 'FF4B5563' } },
+            fill: { fgColor: { rgb: 'FFF8FAFC' }, patternType: 'solid' },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border
+          };
+        } else if (R > 2 && C > 0 && cell.v) {
+          // Ders hücresi — ders koduna göre renk
+          const courseCode = (cell.v + '').split('\n')[0];
+          const cIdx = courseColorMap[courseCode] !== undefined ? courseColorMap[courseCode] : 0;
+          const colors = EXCEL_COURSE_COLORS[cIdx];
+          cell.s = {
+            font: { name: 'Calibri', sz: 9, color: { rgb: 'FF' + colors.font }, bold: false },
+            fill: { fgColor: { rgb: colors.bg }, patternType: 'solid' },
+            alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+            border: {
+              top: { style: 'thin', color: { rgb: 'FF' + colors.font + '44' } },
+              bottom: { style: 'thin', color: { rgb: 'FF' + colors.font + '44' } },
+              left: { style: 'thin', color: { rgb: 'FF' + colors.font + '44' } },
+              right: { style: 'thin', color: { rgb: 'FF' + colors.font + '44' } }
+            }
+          };
+        } else if (R > 2 && C > 0) {
+          // Boş ders hücresi
+          cell.s = {
+            fill: { fgColor: { rgb: 'FFFFFFFF' }, patternType: 'solid' },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border
+          };
+        }
+      }
+    }
+
+    window.XLSX.utils.book_append_sheet(wb, wsMatrix, 'Ders Programım');
+
+    // ─── Ders Detayları Sayfası ───
     const detailRows = [
-      ['Ders Kodu', 'Ders Adı', 'Bileşen', 'Seçilen Şube', 'Öğretim Üyesi', 'Derslik', 'Gün ve Saatler', 'Aynı Saatteki Alternatifler']
+      ['Ders Kodu', 'Ders Adı', 'Bileşen', 'Seçilen Şube', 'Öğretim Üyesi', 'Derslik', 'Gün ve Saatler', 'Alternatif Şubeler']
     ];
 
     sch.selections.forEach(sel => {
@@ -4670,20 +5133,11 @@ function exportToExcel(sch, prefix) {
       const alts = sel.allSections && sel.allSections.length > 1
         ? sel.allSections.map(a => `Ş.${a.section} (${a.instructor})`).join(' | ')
         : 'Yok';
-
-      detailRows.push([
-        sel.courseCode,
-        sel.courseName,
-        sel.component === 'lab' ? 'Laboratuvar' : 'Teori',
-        sel.section,
-        instrs,
-        rooms,
-        times,
-        alts
-      ]);
+      detailRows.push([sel.courseCode, sel.courseName, sel.component === 'lab' ? 'Laboratuvar' : 'Teori', sel.section, instrs, rooms, times, alts]);
     });
 
     const wsDetail = window.XLSX.utils.aoa_to_sheet(detailRows);
+    wsDetail['!cols'] = [{ wch: 12 }, { wch: 28 }, { wch: 14 }, { wch: 12 }, { wch: 36 }, { wch: 14 }, { wch: 32 }, { wch: 40 }];
     window.XLSX.utils.book_append_sheet(wb, wsDetail, 'Ders Detayları');
 
     window.XLSX.writeFile(wb, `${prefix}.xlsx`);
