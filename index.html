@@ -921,6 +921,72 @@ body::after {
   white-space: nowrap;
 }
 
+/* Ekle-Sil Rozeti (1-2 Ekim) */
+.header-add-drop-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 13px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.22) 0%, rgba(245, 158, 11, 0.2) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.65);
+  border-radius: var(--radius-full);
+  font-size: 0.73rem;
+  color: #fbbf24;
+  font-weight: 700;
+  letter-spacing: 0.25px;
+  white-space: nowrap;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  animation: addDropGlow 2.5s ease-in-out infinite alternate;
+  user-select: none;
+}
+[data-theme="light"] .header-add-drop-badge, body.light .header-add-drop-badge {
+  background: linear-gradient(135deg, #fef3c7 0%, #fee2e2 100%);
+  border-color: #f59e0b;
+  color: #b45309;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+}
+.add-drop-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  display: inline-block;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: addDropPulse 1.8s infinite;
+  flex-shrink: 0;
+}
+.add-drop-badge-icon {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+.add-drop-badge-text {
+  line-height: 1;
+}
+@keyframes addDropPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.75);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+@keyframes addDropGlow {
+  0% {
+    border-color: rgba(245, 158, 11, 0.5);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+  }
+  100% {
+    border-color: rgba(239, 68, 68, 0.8);
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.35);
+  }
+}
+
 /* Hero Başlık ve Alt Başlık */
 .header-hero {
   text-align: center;
@@ -2308,12 +2374,12 @@ function extractInstructorsByCourse(courses) {
 const DEFAULT_DATA = { courses: [
 { code:"BM101", name:"Bilgisayar Programlama", type:"departmental", components:[
   { component:"theory", sections:[
-    { section:1, instructor:"Dr. Öğr. Üyesi Hüseyin Temuçin", room:"416", slots:[{day:"Perşembe",start:"13:30",end:"15:20"}] },
-    { section:2, instructor:"Dr. Öğr. Üyesi Hüseyin Temuçin", room:"416", slots:[{day:"Perşembe",start:"15:30",end:"17:20"}] }
+    { section:1, instructor:"Dr. Öğr. Üyesi Hüseyin Temuçin", room:"402", slots:[{day:"Perşembe",start:"14:30",end:"16:20"}] },
+    { section:2, instructor:"Dr. Öğr. Üyesi Hüseyin Temuçin", room:"416", slots:[{day:"Perşembe",start:"12:30",end:"14:20"}] }
   ]},
   { component:"lab", sections:[
-    { section:1, instructor:"Dr. Öğr. Üyesi Sinem Tuğba Şahin Tekin", room:"400", slots:[{day:"Pazartesi",start:"10:30",end:"12:20"}] },
-    { section:2, instructor:"Dr. Öğr. Üyesi Sinem Tuğba Şahin Tekin", room:"400", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"}] }
+    { section:1, instructor:"Arş. Gör. KEVSER ÖZDEM KARACA", room:"400", slots:[{day:"Pazartesi",start:"10:30",end:"12:20"}] },
+    { section:2, instructor:"Arş. Gör. KEVSER ÖZDEM KARACA", room:"400", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"}] }
   ]}
 ]},
 { code:"BM103", name:"Bilg. Müh. Temelleri", type:"departmental", components:[
@@ -2480,6 +2546,12 @@ const HeaderEnhanced = React.memo(function HeaderEnhanced({ theme, onToggleTheme
     return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
   }, [now]);
 
+  // Ekle-Sil günleri: 1-2 Ekim. 3 Ekim'de otomatik olarak kalkar.
+  const isAddDropActive = useMemo(() => {
+    const d = now;
+    return d.getMonth() === 9 && (d.getDate() === 1 || d.getDate() === 2);
+  }, [now]);
+
   return h('header', { className: 'header-enhanced' },
     // Top Bar (3 blocks: Sol, Merkez, Sağ)
     h('div', { className: 'header-top-bar' },
@@ -2512,12 +2584,23 @@ const HeaderEnhanced = React.memo(function HeaderEnhanced({ theme, onToggleTheme
           )
         )
       ),
-      // 3. SAĞ ALAN (Right): Tarih + Tema Değiştirme
+      // 3. SAĞ ALAN (Right): Tarih + Ekle-Sil + Tema Değiştirme
       h('div', { className: 'header-right' },
         // Tarih
         h('div', { className: 'header-date-badge' },
           h('span', null, '📆'),
           h('span', null, dateStr)
+        ),
+        // Ekle-Sil Bildirimi (1-2 Ekim'de görünür, 3 Ekim'de otomatik olarak kalkar)
+        isAddDropActive && h('div', {
+          className: 'header-add-drop-badge',
+          title: 'Ders kayıtlarında Ekle-Sil işlemleri 1-2 Ekim tarihlerinde yapılmaktadır. 3 Ekim itibarıyla sona erer.',
+          role: 'status',
+          'aria-label': 'Ekle-Sil İşlemleri'
+        },
+          h('span', { className: 'add-drop-pulse-dot' }),
+          h('span', { className: 'add-drop-badge-icon' }, '⚡'),
+          h('span', { className: 'add-drop-badge-text' }, 'Ekle-Sil Günleri (1-2 Ekim)')
         ),
         // Tema Değiştirme (Dark / Light)
         h(ThemeToggle, { theme, onToggle: onToggleTheme })
@@ -4424,6 +4507,7 @@ function App() {
             : item.name.includes('Şerife') ? 'Şerife Hoca'
             : item.name.includes('Yunus') ? 'Yunus Hoca'
             : item.name.includes('Kıvanç') ? 'Kıvanç Hoca'
+            : /kevser/i.test(item.name) ? 'Kevser Hoca'
             : item.name.split(' ').slice(-1)[0] + ' Hoca';
           actions.push(`${shortName} seçildi`);
         }

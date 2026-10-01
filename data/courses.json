@@ -11,9 +11,9 @@
             {
               "section": 1,
               "instructor": "Dr. Öğr. Üyesi Hüseyin Temuçin",
-              "room": "MÜH-BİL-416",
+              "room": "MÜH-BİL-402",
               "slots": [
-                { "day": "Perşembe", "start": "13:30", "end": "15:20" }
+                { "day": "Perşembe", "start": "14:30", "end": "16:20" }
               ]
             },
             {
@@ -21,7 +21,7 @@
               "instructor": "Dr. Öğr. Üyesi Hüseyin Temuçin",
               "room": "MÜH-BİL-416",
               "slots": [
-                { "day": "Perşembe", "start": "15:30", "end": "17:20" }
+                { "day": "Perşembe", "start": "12:30", "end": "14:20" }
               ]
             }
           ]
@@ -31,7 +31,7 @@
           "sections": [
             {
               "section": 1,
-              "instructor": "Dr. Öğr. Üyesi Sinem Tuğba Şahin Tekin",
+              "instructor": "Arş. Gör. KEVSER ÖZDEM KARACA",
               "room": "MÜH-BİL-400",
               "slots": [
                 { "day": "Pazartesi", "start": "10:30", "end": "12:20" }
@@ -39,7 +39,7 @@
             },
             {
               "section": 2,
-              "instructor": "Dr. Öğr. Üyesi Sinem Tuğba Şahin Tekin",
+              "instructor": "Arş. Gör. KEVSER ÖZDEM KARACA",
               "room": "MÜH-BİL-400",
               "slots": [
                 { "day": "Pazartesi", "start": "13:30", "end": "15:20" }
