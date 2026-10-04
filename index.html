@@ -2308,12 +2308,12 @@ function extractInstructorsByCourse(courses) {
 const DEFAULT_DATA = { courses: [
 { code:"BM101", name:"Bilgisayar Programlama", type:"departmental", components:[
   { component:"theory", sections:[
-    { section:1, instructor:"Dr. Öğr. Üyesi Hüseyin Temuçin", room:"416", slots:[{day:"Perşembe",start:"13:30",end:"15:20"}] },
-    { section:2, instructor:"Dr. Öğr. Üyesi Hüseyin Temuçin", room:"416", slots:[{day:"Perşembe",start:"15:30",end:"17:20"}] }
+    { section:1, instructor:"Dr. Öğr. Üyesi Hüseyin Temuçin", room:"MÜH-BİL-402", slots:[{day:"Perşembe",start:"14:30",end:"16:20"}] },
+    { section:2, instructor:"Dr. Öğr. Üyesi Hüseyin Temuçin", room:"MÜH-BİL-416", slots:[{day:"Perşembe",start:"12:30",end:"14:20"}] }
   ]},
   { component:"lab", sections:[
-    { section:1, instructor:"Dr. Öğr. Üyesi Sinem Tuğba Şahin Tekin", room:"400", slots:[{day:"Pazartesi",start:"10:30",end:"12:20"}] },
-    { section:2, instructor:"Dr. Öğr. Üyesi Sinem Tuğba Şahin Tekin", room:"400", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"}] }
+    { section:1, instructor:"Arş. Gör. Kevser Özdem Karaca", room:"MÜH-BİL-400", slots:[{day:"Pazartesi",start:"10:30",end:"12:20"}] },
+    { section:2, instructor:"Arş. Gör. Kevser Özdem Karaca", room:"MÜH-BİL-400", slots:[{day:"Pazartesi",start:"13:30",end:"15:20"}] }
   ]}
 ]},
 { code:"BM103", name:"Bilg. Müh. Temelleri", type:"departmental", components:[
@@ -3745,7 +3745,7 @@ const ChatbotWidget = React.memo(function ChatbotWidget({
     {
       id: 'welcome',
       sender: 'bot',
-      text: 'Merhaba! Ben Ders Programı Asistanınız 🤖.\n\nHoca tercihlerinizi ("Esra Hoca", "Feyza Yıldırım"), saat isteklerinizi ("sabah olmasın", "öğleden sonra", "10\'dan sonra") veya şube atamalarınızı ("BM101 Şube 2 olsun") bana yazabilirsiniz!',
+      text: 'Merhaba! Ben Ders Programı Asistanınız 🤖.\n\nHoca tercihlerinizi ("Esra Hoca", "Kevser Hoca", "Feyza Yıldırım"), saat isteklerinizi ("sabah olmasın", "öğleden sonra", "10\'dan sonra") veya şube atamalarınızı ("BM101 Şube 2 olsun") bana yazabilirsiniz!',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -3825,6 +3825,7 @@ const ChatbotWidget = React.memo(function ChatbotWidget({
   const quickSuggestions = [
     'Esra Hoca ve sabah olmasın',
     'Feyza Yıldırım seç',
+    'Kevser Hoca seç',
     'BM101 Şube 2 olsun',
     'Cuma boş olsun',
     'Öğle molası ver',
@@ -4421,6 +4422,7 @@ function App() {
           const shortName = item.name.includes('Esra') ? 'Esra Hoca'
             : item.name.includes('Feyza') ? 'Feyza Yıldırım'
             : item.name.includes('Hüseyin') ? 'Hüseyin Hoca'
+            : item.name.includes('Kevser') ? 'Kevser Hoca'
             : item.name.includes('Şerife') ? 'Şerife Hoca'
             : item.name.includes('Yunus') ? 'Yunus Hoca'
             : item.name.includes('Kıvanç') ? 'Kıvanç Hoca'
