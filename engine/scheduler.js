@@ -211,22 +211,6 @@ function generateSchedules(courses, freeDays = [], instructorFilters = {}, maxRe
  * Lower totalGap = more compact = better.
  */
 function calculateCompactnessScore(slots) {
-  const isOnlineSlot = (s) => {
-    if (!s) return false;
-    const code = (s.courseCode || '').toUpperCase();
-    const room = (s.room || '').toUpperCase();
-    return (
-      code.startsWith('TAR') ||
-      code.startsWith('HIST') ||
-      code.startsWith('ATA') ||
-      s.isOnline === true ||
-      room.includes('UZAKTAN') ||
-      room.includes('ONLINE') ||
-      room.includes('ÇEVRIMIÇI') ||
-      room.includes('CEVRIMICI')
-    );
-  };
-
   const daySlots = {};
   
   for (const slot of slots) {
@@ -243,21 +227,17 @@ function calculateCompactnessScore(slots) {
     const slotsForDay = daySlots[day];
     if (!slotsForDay || slotsForDay.length === 0) continue;
     
-    // Calculate total hours across all slots including online
-    for (const s of slotsForDay) {
-      totalHours += (timeToMinutes(s.end) - timeToMinutes(s.start)) / 60;
-    }
-
-    // Physical slots only for gap and active day counting
-    const f2fSlots = slotsForDay.filter(s => !isOnlineSlot(s));
-    if (!f2fSlots.length) continue;
-
     activeDays++;
     
     // Sort by start time
-    const sorted = [...f2fSlots].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
+    const sorted = slotsForDay.sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
     
-    // Calculate gaps between consecutive physical classes
+    // Calculate total hours
+    for (const s of sorted) {
+      totalHours += (timeToMinutes(s.end) - timeToMinutes(s.start)) / 60;
+    }
+    
+    // Calculate gaps between consecutive classes
     let dayGap = 0;
     for (let i = 1; i < sorted.length; i++) {
       const prevEnd = timeToMinutes(sorted[i - 1].end);
