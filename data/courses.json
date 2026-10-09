@@ -191,7 +191,7 @@
               "instructor": "Doç. Dr. Aycan Özkan",
               "room": "MÜH-ORT-DERS-119",
               "slots": [
-                { "day": "Salı", "start": "14:30", "end": "15:20" },
+                { "day": "Salı", "start": "13:30", "end": "15:20" },
                 { "day": "Perşembe", "start": "08:30", "end": "10:20" }
               ]
             },
@@ -461,7 +461,7 @@
               "instructor": "Öğr. Gör. Aslı Islıkaye",
               "room": "MÜH-ORT-DERS-224",
               "slots": [
-                { "day": "Salı", "start": "13:30", "end": "15:20" }
+                { "day": "Salı", "start": "13:30", "end": "16:20" }
               ]
             },
             {
@@ -469,7 +469,7 @@
               "instructor": "Öğr. Gör. Mehmet Değirmenci",
               "room": "MÜH-ORT-DERS-210",
               "slots": [
-                { "day": "Salı", "start": "13:30", "end": "15:20" }
+                { "day": "Salı", "start": "13:30", "end": "16:20" }
               ]
             },
             {
@@ -517,7 +517,7 @@
               "instructor": "Öğr. Gör. Mehmet Değirmenci",
               "room": "MÜH-ORT-DERS-115",
               "slots": [
-                { "day": "Cuma", "start": "13:30", "end": "16:20" }
+                { "day": "Cuma", "start": "14:30", "end": "17:20" }
               ]
             }
           ]
